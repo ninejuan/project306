@@ -1,0 +1,18 @@
+이 디렉토리는 학급 회장 등의 담당자가 학급 알림표를 작성할 수 있게 한 곳입니다.
+작성 시에는 관리자가 배부한 비밀번호가 필요합니다. (이하 crud key)
+
+구조 정리 (이 디렉토리를 루트 디렉토리라 정의합니다)
+./ -> 공지 확인
+- 공지 하단에는 빨간색으로 삭제 버튼이 추가될 예정이며 클릭 시 swal로 input alert를 띄웁니다.
+- input alert에 입력된 key value가 db에 저장된 crud key와 같을 시 삭제할지 button alert 표시.
+- 최종 삭제 시 delete method로 삭제 요청
+
+./write -> 공지 작성
+
+**접속 시 화면 로드 전 swal input alert로 crud key 받기.**
+js disable 먹히는게 확인되면 하단에 따로 crud key 받는 input 만들기.
+
+공지는 markdown 지원 예정.
+title에는 md 미지원
+content에는 사진 첨부, markdown 지원 예정
+korcen으로 한번 검열
