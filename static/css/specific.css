@@ -1,0 +1,251 @@
+/* 텍스트 색상 코드 */
+.tWhite {
+    color: white;
+}
+.tBlack {
+    color: black;
+}
+.tRed {
+    color: red;
+}
+.tSmoodyRed {
+    color: rgb(255, 146, 146);
+}
+.tLightRed {
+    color: rgb(255, 173, 173);
+}
+.tDarkRed {
+    color: darkred;
+}
+.tCrimson {
+    color: rgb(255, 85, 0);
+}
+.tOrange {
+    color: orange;
+}
+.tSmoodyOrange {
+    color: rgb(255, 203, 107);
+}
+.tLightOrange {
+    color: rgb(255, 226, 172);
+}
+.tDarkOrange {
+    color: rgb(192, 125, 0);
+}
+.tYellow {
+    color: yellow;
+}
+.tSmoodyYellow {
+    color: rgb(254, 254, 126);
+}
+.tLightYellow {
+    color: rgb(255, 255, 191);
+}
+.tDarkYellow {
+    color: rgb(199, 199, 4);
+}
+.tLime {
+    color: lime;
+}
+.tGreen {
+    color: green;
+}
+.tSmoodyGreen {
+    color: rgb(117, 255, 117);
+}
+.tLightGreen {
+    color:rgb(204, 255, 0);
+}
+.tDarkGreen {
+    color: darkgreen;
+}
+.tAqua {
+    color: aqua;
+}
+.tAquamarine {
+    color: aquamarine
+}
+.tBlue {
+    color: blue;
+}
+.tSmoodyBlue {
+    color: rgb(117, 117, 255);
+}
+.tLightBlue {
+    color: rgb(185, 185, 255);
+}
+.tDarkBlue {
+    color: darkblue;
+}
+.tSkyBlue {
+    color: skyblue;
+}
+.tIndigoBlue {
+    color: indigo;
+}
+.tPurple {
+    color: purple;
+}
+.tSmoodyPurple {
+    color: rgb(126, 73, 126);
+}
+.tLightPurple {
+    color: rgb(176, 128, 176);
+}
+.tDarkPurple {
+    color: darkmagenta;
+}
+.tPink {
+    color: pink;
+}
+.tSmoodyPink {
+    color: rgb(255, 224, 229);
+}
+.tLightPink {
+    color: lightpink;
+}
+.tDarkPink {
+    color: darkmagenta;
+}
+.tGray {
+    color: gray;
+}
+.tBrown {
+    color: brown;
+}
+
+/* 텍스트 스타일 */
+.tBold {
+    font-weight: bolder;
+}
+.tNoDec {
+    text-decoration: none;
+}
+.tMiddle {
+    text-align: center;
+}
+
+/* 텍스트 사이즈 */
+.tMoreBig {
+    font-size: xx-large;
+}
+
+
+/* 배경 색 */
+.bWhite {
+    background-color: white;
+}
+.bBlack {
+    background-color: black;
+}
+.bRed {
+    background-color: red;
+}
+.bSmoodyRed {
+    background-color: rgb(255, 146, 146);
+}
+.bLightRed {
+    background-color: rgb(255, 173, 173);
+}
+.bDarkRed {
+    background-color: darkred;
+}
+.bCrimson {
+    background-color: rgb(255, 85, 0);
+}
+.bOrange {
+    background-color: orange;
+}
+.bSmoodyOrange {
+    background-color: rgb(255, 203, 107);
+}
+.bLightOrange {
+    background-color: rgb(255, 226, 172);
+}
+.bDarkOrange {
+    background-color: rgb(192, 125, 0);
+}
+.bYellow {
+    background-color: yellow;
+}
+.bSmoodyYellow {
+    background-color: rgb(254, 254, 126);
+}
+.bLightYellow {
+    background-color: rgb(255, 255, 191);
+}
+.bDarkYellow {
+    background-color: rgb(199, 199, 4);
+}
+.bLime {
+    background-color: lime;
+}
+.bGreen {
+    background-color: green;
+}
+.bSmoodyGreen {
+    background-color: rgb(117, 255, 117);
+}
+.bLightGreen {
+    background-color:rgb(204, 255, 0);
+}
+.bDarkGreen {
+    background-color: darkgreen;
+}
+.bAqua {
+    background-color: aqua;
+}
+.bAquamarine {
+    background-color: aquamarine
+}
+.bBlue {
+    background-color: blue;
+}
+.bSmoodyBlue {
+    background-color: rgb(117, 117, 255);
+}
+.bLightBlue {
+    background-color: rgb(185, 185, 255);
+}
+.bDarkBlue {
+    background-color: darkblue;
+}
+.bSkyBlue {
+    background-color: skyblue;
+}
+.bIndigoBlue {
+    background-color: indigo;
+}
+.bPurple {
+    background-color: purple;
+}
+.bSmoodyPurple {
+    background-color: rgb(126, 73, 126);
+}
+.bLightPurple {
+    background-color: rgb(176, 128, 176);
+}
+.bDarkPurple {
+    background-color: darkmagenta;
+}
+.bPink {
+    background-color: pink;
+}
+.bSmoodyPink {
+    background-color: rgb(255, 224, 229);
+}
+.bLightPink {
+    background-color: lightpink;
+}
+.bDarkPink {
+    background-color: darkmagenta;
+}
+.bGray {
+    background-color: gray;
+}
+.bBrown {
+    background-color: brown;
+}
+.pBorder {
+    border: 5px solid rgb(255, 200, 99);
+}

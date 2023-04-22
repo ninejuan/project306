@@ -4,8 +4,10 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
+		"dev-host": "vite dev --host --port 3060",
 		"build": "vite build",
 		"preview": "vite preview",
+		"production": "vite preview  --host --port 3060",
 		"lint": "prettier --plugin-search-dir . --check .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},

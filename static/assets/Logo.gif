@@ -1,0 +1,1697 @@
+
+                hasPendingName = false;
+                hasPending = true;
+            }
+            if (sourceIndex !== undefined && sourceLine !== undefined && sourceCharacter !== undefined) {
+                pendingSourceIndex = sourceIndex;
+                pendingSourceLine = sourceLine;
+                pendingSourceCharacter = sourceCharacter;
+                hasPendingSource = true;
+                if (nameIndex !== undefined) {
+                    pendingNameIndex = nameIndex;
+                    hasPendingName = true;
+                }
+            }
+            exit();
+        }
+        function appendSourceMap(generatedLine, generatedCharacter, map, sourceMapPath, start, end) {
+            ts.Debug.assert(generatedLine >= pendingGeneratedLine, "generatedLine cannot backtrack");
+            ts.Debug.assert(generatedCharacter >= 0, "generatedCharacter cannot be negative");
+            enter();
+            // First, decode the old component sourcemap
+            var sourceIndexToNewSourceIndexMap = [];
+            var nameIndexToNewNameIndexMap;
+            var mappingIterator = decodeMappings(map.mappings);
+            for (var iterResult = mappingIterator.next(); !iterResult.done; iterResult = mappingIterator.next()) {
+                var raw = iterResult.value;
+                if (end && (raw.generatedLine > end.line ||
+                    (raw.generatedLine === end.line && raw.generatedCharacter > end.character))) {
+                    break;
+                }
+                if (start && (raw.generatedLine < start.line ||
+                    (start.line === raw.generatedLine && raw.generatedCharacter < start.character))) {
+                    continue;
+                }
+                // Then reencode all the updated mappings into the overall map
+                var newSourceIndex = void 0;
+                var newSourceLine = void 0;
+                var newSourceCharacter = void 0;
+                var newNameIndex = void 0;
+                if (raw.sourceIndex !== undefined) {
+                    newSourceIndex = sourceIndexToNewSourceIndexMap[raw.sourceIndex];
+                    if (newSourceIndex === undefined) {
+                        // Apply offsets to each position and fixup source entries
+                        var rawPath = map.sources[raw.sourceIndex];
+                        var relativePath = map.sourceRoot ? ts.combinePaths(map.sourceRoot, rawPath) : rawPath;
+                        var combinedPath = ts.combinePaths(ts.getDirectoryPath(sourceMapPath), relativePath);
+                        sourceIndexToNewSourceIndexMap[raw.sourceIndex] = newSourceIndex = addSource(combinedPath);
+                        if (map.sourcesContent && typeof map.sourcesContent[raw.sourceIndex] === "string") {
+                            setSourceContent(newSourceIndex, map.sourcesContent[raw.sourceIndex]);
+                        }
+                    }
+                    newSourceLine = raw.sourceLine;
+                    newSourceCharacter = raw.sourceCharacter;
+                    if (map.names && raw.nameIndex !== undefined) {
+                        if (!nameIndexToNewNameIndexMap)
+                            nameIndexToNewNameIndexMap = [];
+                        newNameIndex = nameIndexToNewNameIndexMap[raw.nameIndex];
+                        if (newNameIndex === undefined) {
+                            nameIndexToNewNameIndexMap[raw.nameIndex] = newNameIndex = addName(map.names[raw.nameIndex]);
+                        }
+                    }
+                }
+                var rawGeneratedLine = raw.generatedLine - (start ? start.line : 0);
+                var newGeneratedLine = rawGeneratedLine + generatedLine;
+                var rawGeneratedCharacter = start && start.line === raw.generatedLine ? raw.generatedCharacter - start.character : raw.generatedCharacter;
+                var newGeneratedCharacter = rawGeneratedLine === 0 ? rawGeneratedCharacter + generatedCharacter : rawGeneratedCharacter;
+                addMapping(newGeneratedLine, newGeneratedCharacter, newSourceIndex, newSourceLine, newSourceCharacter, newNameIndex);
+            }
+            exit();
+        }
+        function shouldCommitMapping() {
+            return !hasLast
+                || lastGeneratedLine !== pendingGeneratedLine
+                || lastGeneratedCharacter !== pendingGeneratedCharacter
+                || lastSourceIndex !== pendingSourceIndex
+                || lastSourceLine !== pendingSourceLine
+                || lastSourceCharacter !== pendingSourceCharacter
+                || lastNameIndex !== pendingNameIndex;
+        }
+        function appendMappingCharCode(charCode) {
+            mappingCharCodes.push(charCode);
+            // String.fromCharCode accepts its arguments on the stack, so we have to chunk the input,
+            // otherwise we can get stack overflows for large source maps
+            if (mappingCharCodes.length >= 1024) {
+                flushMappingBuffer();
+            }
+        }
+        function commitPendingMapping() {
+            if (!hasPending || !shouldCommitMapping()) {
+                return;
+            }
+            enter();
+            // Line/Comma delimiters
+            if (lastGeneratedLine < pendingGeneratedLine) {
+                // Emit line delimiters
+                do {
+                    appendMappingCharCode(59 /* CharacterCodes.semicolon */);
+                    lastGeneratedLine++;
+                } while (lastGeneratedLine < pendingGeneratedLine);
+                // Only need to set this once
+                lastGeneratedCharacter = 0;
+            }
+            else {
+                ts.Debug.assertEqual(lastGeneratedLine, pendingGeneratedLine, "generatedLine cannot backtrack");
+                // Emit comma to separate the entry
+                if (hasLast) {
+                    appendMappingCharCode(44 /* CharacterCodes.comma */);
+                }
+            }
+            // 1. Relative generated character
+            appendBase64VLQ(pendingGeneratedCharacter - lastGeneratedCharacter);
+            lastGeneratedCharacter = pendingGeneratedCharacter;
+            if (hasPendingSource) {
+                // 2. Relative sourceIndex
+                appendBase64VLQ(pendingSourceIndex - lastSourceIndex);
+                lastSourceIndex = pendingSourceIndex;
+                // 3. Relative source line
+                appendBase64VLQ(pendingSourceLine - lastSourceLine);
+                lastSourceLine = pendingSourceLine;
+                // 4. Relative source character
+                appendBase64VLQ(pendingSourceCharacter - lastSourceCharacter);
+                lastSourceCharacter = pendingSourceCharacter;
+                if (hasPendingName) {
+                    // 5. Relative nameIndex
+                    appendBase64VLQ(pendingNameIndex - lastNameIndex);
+                    lastNameIndex = pendingNameIndex;
+                }
+            }
+            hasLast = true;
+            exit();
+        }
+        function flushMappingBuffer() {
+            if (mappingCharCodes.length > 0) {
+                mappings += String.fromCharCode.apply(undefined, mappingCharCodes);
+                mappingCharCodes.length = 0;
+            }
+        }
+        function toJSON() {
+            commitPendingMapping();
+            flushMappingBuffer();
+            return {
+                version: 3,
+                file: file,
+                sourceRoot: sourceRoot,
+                sources: sources,
+                names: names,
+                mappings: mappings,
+                sourcesContent: sourcesContent,
+            };
+        }
+        function appendBase64VLQ(inValue) {
+            // Add a new least significant bit that has the sign of the value.
+            // if negative number the least significant bit that gets added to the number has value 1
+            // else least significant bit value that gets added is 0
+            // eg. -1 changes to binary : 01 [1] => 3
+            //     +1 changes to binary : 01 [0] => 2
+            if (inValue < 0) {
+                inValue = ((-inValue) << 1) + 1;
+            }
+            else {
+                inValue = inValue << 1;
+            }
+            // Encode 5 bits at a time starting from least significant bits
+            do {
+                var currentDigit = inValue & 31; // 11111
+                inValue = inValue >> 5;
+                if (inValue > 0) {
+                    // There are still more digits to decode, set the msb (6th bit)
+                    currentDigit = currentDigit | 32;
+                }
+                appendMappingCharCode(base64FormatEncode(currentDigit));
+            } while (inValue > 0);
+        }
+    }
+    ts.createSourceMapGenerator = createSourceMapGenerator;
+    // Sometimes tools can see the following line as a source mapping url comment, so we mangle it a bit (the [M])
+    var sourceMapCommentRegExp = /^\/\/[@#] source[M]appingURL=(.+)\r?\n?$/;
+    var whitespaceOrMapCommentRegExp = /^\s*(\/\/[@#] .*)?$/;
+    function getLineInfo(text, lineStarts) {
+        return {
+            getLineCount: function () { return lineStarts.length; },
+            getLineText: function (line) { return text.substring(lineStarts[line], lineStarts[line + 1]); }
+        };
+    }
+    ts.getLineInfo = getLineInfo;
+    /**
+     * Tries to find the sourceMappingURL comment at the end of a file.
+     */
+    function tryGetSourceMappingURL(lineInfo) {
+        for (var index = lineInfo.getLineCount() - 1; index >= 0; index--) {
+            var line = lineInfo.getLineText(index);
+            var comment = sourceMapCommentRegExp.exec(line);
+            if (comment) {
+                return ts.trimStringEnd(comment[1]);
+            }
+            // If we see a non-whitespace/map comment-like line, break, to avoid scanning up the entire file
+            else if (!line.match(whitespaceOrMapCommentRegExp)) {
+                break;
+            }
+        }
+    }
+    ts.tryGetSourceMappingURL = tryGetSourceMappingURL;
+    /* eslint-disable no-null/no-null */
+    function isStringOrNull(x) {
+        return typeof x === "string" || x === null;
+    }
+    function isRawSourceMap(x) {
+        return x !== null
+            && typeof x === "object"
+            && x.version === 3
+            && typeof x.file === "string"
+            && typeof x.mappings === "string"
+            && ts.isArray(x.sources) && ts.every(x.sources, ts.isString)
+            && (x.sourceRoot === undefined || x.sourceRoot === null || typeof x.sourceRoot === "string")
+            && (x.sourcesContent === undefined || x.sourcesContent === null || ts.isArray(x.sourcesContent) && ts.every(x.sourcesContent, isStringOrNull))
+            && (x.names === undefined || x.names === null || ts.isArray(x.names) && ts.every(x.names, ts.isString));
+    }
+    ts.isRawSourceMap = isRawSourceMap;
+    /* eslint-enable no-null/no-null */
+    function tryParseRawSourceMap(text) {
+        try {
+            var parsed = JSON.parse(text);
+            if (isRawSourceMap(parsed)) {
+                return parsed;
+            }
+        }
+        catch (_a) {
+            // empty
+        }
+        return undefined;
+    }
+    ts.tryParseRawSourceMap = tryParseRawSourceMap;
+    function decodeMappings(mappings) {
+        var done = false;
+        var pos = 0;
+        var generatedLine = 0;
+        var generatedCharacter = 0;
+        var sourceIndex = 0;
+        var sourceLine = 0;
+        var sourceCharacter = 0;
+        var nameIndex = 0;
+        var error;
+        return {
+            get pos() { return pos; },
+            get error() { return error; },
+            get state() { return captureMapping(/*hasSource*/ true, /*hasName*/ true); },
+            next: function () {
+                while (!done && pos < mappings.length) {
+                    var ch = mappings.charCodeAt(pos);
+                    if (ch === 59 /* CharacterCodes.semicolon */) {
+                        // new line
+                        generatedLine++;
+                        generatedCharacter = 0;
+                        pos++;
+                        continue;
+                    }
+                    if (ch === 44 /* CharacterCodes.comma */) {
+                        // Next entry is on same line - no action needed
+                        pos++;
+                        continue;
+                    }
+                    var hasSource = false;
+                    var hasName = false;
+                    generatedCharacter += base64VLQFormatDecode();
+                    if (hasReportedError())
+                        return stopIterating();
+                    if (generatedCharacter < 0)
+                        return setErrorAndStopIterating("Invalid generatedCharacter found");
+                    if (!isSourceMappingSegmentEnd()) {
+                        hasSource = true;
+                        sourceIndex += base64VLQFormatDecode();
+                        if (hasReportedError())
+                            return stopIterating();
+                        if (sourceIndex < 0)
+                            return setErrorAndStopIterating("Invalid sourceIndex found");
+                        if (isSourceMappingSegmentEnd())
+                            return setErrorAndStopIterating("Unsupported Format: No entries after sourceIndex");
+                        sourceLine += base64VLQFormatDecode();
+                        if (hasReportedError())
+                            return stopIterating();
+                        if (sourceLine < 0)
+                            return setErrorAndStopIterating("Invalid sourceLine found");
+                        if (isSourceMappingSegmentEnd())
+                            return setErrorAndStopIterating("Unsupported Format: No entries after sourceLine");
+                        sourceCharacter += base64VLQFormatDecode();
+                        if (hasReportedError())
+                            return stopIterating();
+                        if (sourceCharacter < 0)
+                            return setErrorAndStopIterating("Invalid sourceCharacter found");
+                        if (!isSourceMappingSegmentEnd()) {
+                            hasName = true;
+                            nameIndex += base64VLQFormatDecode();
+                            if (hasReportedError())
+                                return stopIterating();
+                            if (nameIndex < 0)
+                                return setErrorAndStopIterating("Invalid nameIndex found");
+                            if (!isSourceMappingSegmentEnd())
+                                return setErrorAndStopIterating("Unsupported Error Format: Entries after nameIndex");
+                        }
+                    }
+                    return { value: captureMapping(hasSource, hasName), done: done };
+                }
+                return stopIterating();
+            }
+        };
+        function captureMapping(hasSource, hasName) {
+            return {
+                generatedLine: generatedLine,
+                generatedCharacter: generatedCharacter,
+                sourceIndex: hasSource ? sourceIndex : undefined,
+                sourceLine: hasSource ? sourceLine : undefined,
+                sourceCharacter: hasSource ? sourceCharacter : undefined,
+                nameIndex: hasName ? nameIndex : undefined
+            };
+        }
+        function stopIterating() {
+            done = true;
+            return { value: undefined, done: true };
+        }
+        function setError(message) {
+            if (error === undefined) {
+                error = message;
+            }
+        }
+        function setErrorAndStopIterating(message) {
+            setError(message);
+            return stopIterating();
+        }
+        function hasReportedError() {
+            return error !== undefined;
+        }
+        function isSourceMappingSegmentEnd() {
+            return (pos === mappings.length ||
+                mappings.charCodeAt(pos) === 44 /* CharacterCodes.comma */ ||
+                mappings.charCodeAt(pos) === 59 /* CharacterCodes.semicolon */);
+        }
+        function base64VLQFormatDecode() {
+            var moreDigits = true;
+            var shiftCount = 0;
+            var value = 0;
+            for (; moreDigits; pos++) {
+                if (pos >= mappings.length)
+                    return setError("Error in decoding base64VLQFormatDecode, past the mapping string"), -1;
+                // 6 digit number
+                var currentByte = base64FormatDecode(mappings.charCodeAt(pos));
+                if (currentByte === -1)
+                    return setError("Invalid character in VLQ"), -1;
+                // If msb is set, we still have more bits to continue
+                moreDigits = (currentByte & 32) !== 0;
+                // least significant 5 bits are the next msbs in the final value.
+                value = value | ((currentByte & 31) << shiftCount);
+                shiftCount += 5;
+            }
+            // Least significant bit if 1 represents negative and rest of the msb is actual absolute value
+            if ((value & 1) === 0) {
+                // + number
+                value = value >> 1;
+            }
+            else {
+                // - number
+                value = value >> 1;
+                value = -value;
+            }
+            return value;
+        }
+    }
+    ts.decodeMappings = decodeMappings;
+    function sameMapping(left, right) {
+        return left === right
+            || left.generatedLine === right.generatedLine
+                && left.generatedCharacter === right.generatedCharacter
+                && left.sourceIndex === right.sourceIndex
+                && left.sourceLine === right.sourceLine
+                && left.sourceCharacter === right.sourceCharacter
+                && left.nameIndex === right.nameIndex;
+    }
+    ts.sameMapping = sameMapping;
+    function isSourceMapping(mapping) {
+        return mapping.sourceIndex !== undefined
+            && mapping.sourceLine !== undefined
+            && mapping.sourceCharacter !== undefined;
+    }
+    ts.isSourceMapping = isSourceMapping;
+    function base64FormatEncode(value) {
+        return value >= 0 && value < 26 ? 65 /* CharacterCodes.A */ + value :
+            value >= 26 && value < 52 ? 97 /* CharacterCodes.a */ + value - 26 :
+                value >= 52 && value < 62 ? 48 /* CharacterCodes._0 */ + value - 52 :
+                    value === 62 ? 43 /* CharacterCodes.plus */ :
+                        value === 63 ? 47 /* CharacterCodes.slash */ :
+                            ts.Debug.fail("".concat(value, ": not a base64 value"));
+    }
+    function base64FormatDecode(ch) {
+        return ch >= 65 /* CharacterCodes.A */ && ch <= 90 /* CharacterCodes.Z */ ? ch - 65 /* CharacterCodes.A */ :
+            ch >= 97 /* CharacterCodes.a */ && ch <= 122 /* CharacterCodes.z */ ? ch - 97 /* CharacterCodes.a */ + 26 :
+                ch >= 48 /* CharacterCodes._0 */ && ch <= 57 /* CharacterCodes._9 */ ? ch - 48 /* CharacterCodes._0 */ + 52 :
+                    ch === 43 /* CharacterCodes.plus */ ? 62 :
+                        ch === 47 /* CharacterCodes.slash */ ? 63 :
+                            -1;
+    }
+    function isSourceMappedPosition(value) {
+        return value.sourceIndex !== undefined
+            && value.sourcePosition !== undefined;
+    }
+    function sameMappedPosition(left, right) {
+        return left.generatedPosition === right.generatedPosition
+            && left.sourceIndex === right.sourceIndex
+            && left.sourcePosition === right.sourcePosition;
+    }
+    function compareSourcePositions(left, right) {
+        // Compares sourcePosition without comparing sourceIndex
+        // since the mappings are grouped by sourceIndex
+        ts.Debug.assert(left.sourceIndex === right.sourceIndex);
+        return ts.compareValues(left.sourcePosition, right.sourcePosition);
+    }
+    function compareGeneratedPositions(left, right) {
+        return ts.compareValues(left.generatedPosition, right.generatedPosition);
+    }
+    function getSourcePositionOfMapping(value) {
+        return value.sourcePosition;
+    }
+    function getGeneratedPositionOfMapping(value) {
+        return value.generatedPosition;
+    }
+    function createDocumentPositionMapper(host, map, mapPath) {
+        var mapDirectory = ts.getDirectoryPath(mapPath);
+        var sourceRoot = map.sourceRoot ? ts.getNormalizedAbsolutePath(map.sourceRoot, mapDirectory) : mapDirectory;
+        var generatedAbsoluteFilePath = ts.getNormalizedAbsolutePath(map.file, mapDirectory);
+        var generatedFile = host.getSourceFileLike(generatedAbsoluteFilePath);
+        var sourceFileAbsolutePaths = map.sources.map(function (source) { return ts.getNormalizedAbsolutePath(source, sourceRoot); });
+        var sourceToSourceIndexMap = new ts.Map(sourceFileAbsolutePaths.map(function (source, i) { return [host.getCanonicalFileName(source), i]; }));
+        var decodedMappings;
+        var generatedMappings;
+        var sourceMappings;
+        return {
+            getSourcePosition: getSourcePosition,
+            getGeneratedPosition: getGeneratedPosition
+        };
+        function processMapping(mapping) {
+            var generatedPosition = generatedFile !== undefined
+                ? ts.getPositionOfLineAndCharacter(generatedFile, mapping.generatedLine, mapping.generatedCharacter, /*allowEdits*/ true)
+                : -1;
+            var source;
+            var sourcePosition;
+            if (isSourceMapping(mapping)) {
+                var sourceFile = host.getSourceFileLike(sourceFileAbsolutePaths[mapping.sourceIndex]);
+                source = map.sources[mapping.sourceIndex];
+                sourcePosition = sourceFile !== undefined
+                    ? ts.getPositionOfLineAndCharacter(sourceFile, mapping.sourceLine, mapping.sourceCharacter, /*allowEdits*/ true)
+                    : -1;
+            }
+            return {
+                generatedPosition: generatedPosition,
+                source: source,
+                sourceIndex: mapping.sourceIndex,
+                sourcePosition: sourcePosition,
+                nameIndex: mapping.nameIndex
+            };
+        }
+        function getDecodedMappings() {
+            if (decodedMappings === undefined) {
+                var decoder = decodeMappings(map.mappings);
+                var mappings = ts.arrayFrom(decoder, processMapping);
+                if (decoder.error !== undefined) {
+                    if (host.log) {
+                        host.log("Encountered error while decoding sourcemap: ".concat(decoder.error));
+                    }
+                    decodedMappings = ts.emptyArray;
+                }
+                else {
+                    decodedMappings = mappings;
+                }
+            }
+            return decodedMappings;
+        }
+        function getSourceMappings(sourceIndex) {
+            if (sourceMappings === undefined) {
+                var lists = [];
+                for (var _i = 0, _a = getDecodedMappings(); _i < _a.length; _i++) {
+                    var mapping = _a[_i];
+                    if (!isSourceMappedPosition(mapping))
+                        continue;
+                    var list = lists[mapping.sourceIndex];
+                    if (!list)
+                        lists[mapping.sourceIndex] = list = [];
+                    list.push(mapping);
+                }
+                sourceMappings = lists.map(function (list) { return ts.sortAndDeduplicate(list, compareSourcePositions, sameMappedPosition); });
+            }
+            return sourceMappings[sourceIndex];
+        }
+        function getGeneratedMappings() {
+            if (generatedMappings === undefined) {
+                var list = [];
+                for (var _i = 0, _a = getDecodedMappings(); _i < _a.length; _i++) {
+                    var mapping = _a[_i];
+                    list.push(mapping);
+                }
+                generatedMappings = ts.sortAndDeduplicate(list, compareGeneratedPositions, sameMappedPosition);
+            }
+            return generatedMappings;
+        }
+        function getGeneratedPosition(loc) {
+            var sourceIndex = sourceToSourceIndexMap.get(host.getCanonicalFileName(loc.fileName));
+            if (sourceIndex === undefined)
+                return loc;
+            var sourceMappings = getSourceMappings(sourceIndex);
+            if (!ts.some(sourceMappings))
+                return loc;
+            var targetIndex = ts.binarySearchKey(sourceMappings, loc.pos, getSourcePositionOfMapping, ts.compareValues);
+            if (targetIndex < 0) {
+                // if no exact match, closest is 2's complement of result
+                targetIndex = ~targetIndex;
+            }
+            var mapping = sourceMappings[targetIndex];
+            if (mapping === undefined || mapping.sourceIndex !== sourceIndex) {
+                return loc;
+            }
+            return { fileName: generatedAbsoluteFilePath, pos: mapping.generatedPosition }; // Closest pos
+        }
+        function getSourcePosition(loc) {
+            var generatedMappings = getGeneratedMappings();
+            if (!ts.some(generatedMappings))
+                return loc;
+            var targetIndex = ts.binarySearchKey(generatedMappings, loc.pos, getGeneratedPositionOfMapping, ts.compareValues);
+            if (targetIndex < 0) {
+                // if no exact match, closest is 2's complement of result
+                targetIndex = ~targetIndex;
+            }
+            var mapping = generatedMappings[targetIndex];
+            if (mapping === undefined || !isSourceMappedPosition(mapping)) {
+                return loc;
+            }
+            return { fileName: sourceFileAbsolutePaths[mapping.sourceIndex], pos: mapping.sourcePosition }; // Closest pos
+        }
+    }
+    ts.createDocumentPositionMapper = createDocumentPositionMapper;
+    ts.identitySourceMapConsumer = {
+        getSourcePosition: ts.identity,
+        getGeneratedPosition: ts.identity
+    };
+})(ts || (ts = {}));
+/* @internal */
+var ts;
+(function (ts) {
+    function getOriginalNodeId(node) {
+        node = ts.getOriginalNode(node);
+        return node ? ts.getNodeId(node) : 0;
+    }
+    ts.getOriginalNodeId = getOriginalNodeId;
+    function containsDefaultReference(node) {
+        if (!node)
+            return false;
+        if (!ts.isNamedImports(node))
+            return false;
+        return ts.some(node.elements, isNamedDefaultReference);
+    }
+    function isNamedDefaultReference(e) {
+        return e.propertyName !== undefined && e.propertyName.escapedText === "default" /* InternalSymbolName.Default */;
+    }
+    function chainBundle(context, transformSourceFile) {
+        return transformSourceFileOrBundle;
+        function transformSourceFileOrBundle(node) {
+            return node.kind === 308 /* SyntaxKind.SourceFile */ ? transformSourceFile(node) : transformBundle(node);
+        }
+        function transformBundle(node) {
+            return context.factory.createBundle(ts.map(node.sourceFiles, transformSourceFile), node.prepends);
+        }
+    }
+    ts.chainBundle = chainBundle;
+    function getExportNeedsImportStarHelper(node) {
+        return !!ts.getNamespaceDeclarationNode(node);
+    }
+    ts.getExportNeedsImportStarHelper = getExportNeedsImportStarHelper;
+    function getImportNeedsImportStarHelper(node) {
+        if (!!ts.getNamespaceDeclarationNode(node)) {
+            return true;
+        }
+        var bindings = node.importClause && node.importClause.namedBindings;
+        if (!bindings) {
+            return false;
+        }
+        if (!ts.isNamedImports(bindings))
+            return false;
+        var defaultRefCount = 0;
+        for (var _i = 0, _a = bindings.elements; _i < _a.length; _i++) {
+            var binding = _a[_i];
+            if (isNamedDefaultReference(binding)) {
+                defaultRefCount++;
+            }
+        }
+        // Import star is required if there's default named refs mixed with non-default refs, or if theres non-default refs and it has a default import
+        return (defaultRefCount > 0 && defaultRefCount !== bindings.elements.length) || (!!(bindings.elements.length - defaultRefCount) && ts.isDefaultImport(node));
+    }
+    ts.getImportNeedsImportStarHelper = getImportNeedsImportStarHelper;
+    function getImportNeedsImportDefaultHelper(node) {
+        // Import default is needed if there's a default import or a default ref and no other refs (meaning an import star helper wasn't requested)
+        return !getImportNeedsImportStarHelper(node) && (ts.isDefaultImport(node) || (!!node.importClause && ts.isNamedImports(node.importClause.namedBindings) && containsDefaultReference(node.importClause.namedBindings))); // TODO: GH#18217
+    }
+    ts.getImportNeedsImportDefaultHelper = getImportNeedsImportDefaultHelper;
+    function collectExternalModuleInfo(context, sourceFile, resolver, compilerOptions) {
+        var externalImports = [];
+        var exportSpecifiers = ts.createMultiMap();
+        var exportedBindings = [];
+        var uniqueExports = new ts.Map();
+        var exportedNames;
+        var hasExportDefault = false;
+        var exportEquals;
+        var hasExportStarsToExportValues = false;
+        var hasImportStar = false;
+        var hasImportDefault = false;
+        for (var _i = 0, _a = sourceFile.statements; _i < _a.length; _i++) {
+            var node = _a[_i];
+            switch (node.kind) {
+                case 269 /* SyntaxKind.ImportDeclaration */:
+                    // import "mod"
+                    // import x from "mod"
+                    // import * as x from "mod"
+                    // import { x, y } from "mod"
+                    externalImports.push(node);
+                    if (!hasImportStar && getImportNeedsImportStarHelper(node)) {
+                        hasImportStar = true;
+                    }
+                    if (!hasImportDefault && getImportNeedsImportDefaultHelper(node)) {
+                        hasImportDefault = true;
+                    }
+                    break;
+                case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                    if (node.moduleReference.kind === 280 /* SyntaxKind.ExternalModuleReference */) {
+                        // import x = require("mod")
+                        externalImports.push(node);
+                    }
+                    break;
+                case 275 /* SyntaxKind.ExportDeclaration */:
+                    if (node.moduleSpecifier) {
+                        if (!node.exportClause) {
+                            // export * from "mod"
+                            externalImports.push(node);
+                            hasExportStarsToExportValues = true;
+                        }
+                        else {
+                            // export * as ns from "mod"
+                            // export { x, y } from "mod"
+                            externalImports.push(node);
+                            if (ts.isNamedExports(node.exportClause)) {
+                                addExportedNamesForExportDeclaration(node);
+                            }
+                            else {
+                                var name = node.exportClause.name;
+                                if (!uniqueExports.get(ts.idText(name))) {
+                                    multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), name);
+                                    uniqueExports.set(ts.idText(name), true);
+                                    exportedNames = ts.append(exportedNames, name);
+                                }
+                                // we use the same helpers for `export * as ns` as we do for `import * as ns`
+                                hasImportStar = true;
+                            }
+                        }
+                    }
+                    else {
+                        // export { x, y }
+                        addExportedNamesForExportDeclaration(node);
+                    }
+                    break;
+                case 274 /* SyntaxKind.ExportAssignment */:
+                    if (node.isExportEquals && !exportEquals) {
+                        // export = x
+                        exportEquals = node;
+                    }
+                    break;
+                case 240 /* SyntaxKind.VariableStatement */:
+                    if (ts.hasSyntacticModifier(node, 1 /* ModifierFlags.Export */)) {
+                        for (var _b = 0, _c = node.declarationList.declarations; _b < _c.length; _b++) {
+                            var decl = _c[_b];
+                            exportedNames = collectExportedVariableInfo(decl, uniqueExports, exportedNames);
+                        }
+                    }
+                    break;
+                case 259 /* SyntaxKind.FunctionDeclaration */:
+                    if (ts.hasSyntacticModifier(node, 1 /* ModifierFlags.Export */)) {
+                        if (ts.hasSyntacticModifier(node, 1024 /* ModifierFlags.Default */)) {
+                            // export default function() { }
+                            if (!hasExportDefault) {
+                                multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), context.factory.getDeclarationName(node));
+                                hasExportDefault = true;
+                            }
+                        }
+                        else {
+                            // export function x() { }
+                            var name = node.name;
+                            if (!uniqueExports.get(ts.idText(name))) {
+                                multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), name);
+                                uniqueExports.set(ts.idText(name), true);
+                                exportedNames = ts.append(exportedNames, name);
+                            }
+                        }
+                    }
+                    break;
+                case 260 /* SyntaxKind.ClassDeclaration */:
+                    if (ts.hasSyntacticModifier(node, 1 /* ModifierFlags.Export */)) {
+                        if (ts.hasSyntacticModifier(node, 1024 /* ModifierFlags.Default */)) {
+                            // export default class { }
+                            if (!hasExportDefault) {
+                                multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), context.factory.getDeclarationName(node));
+                                hasExportDefault = true;
+                            }
+                        }
+                        else {
+                            // export class x { }
+                            var name = node.name;
+                            if (name && !uniqueExports.get(ts.idText(name))) {
+                                multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), name);
+                                uniqueExports.set(ts.idText(name), true);
+                                exportedNames = ts.append(exportedNames, name);
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        var externalHelpersImportDeclaration = ts.createExternalHelpersImportDeclarationIfNeeded(context.factory, context.getEmitHelperFactory(), sourceFile, compilerOptions, hasExportStarsToExportValues, hasImportStar, hasImportDefault);
+        if (externalHelpersImportDeclaration) {
+            externalImports.unshift(externalHelpersImportDeclaration);
+        }
+        return { externalImports: externalImports, exportSpecifiers: exportSpecifiers, exportEquals: exportEquals, hasExportStarsToExportValues: hasExportStarsToExportValues, exportedBindings: exportedBindings, exportedNames: exportedNames, externalHelpersImportDeclaration: externalHelpersImportDeclaration };
+        function addExportedNamesForExportDeclaration(node) {
+            for (var _i = 0, _a = ts.cast(node.exportClause, ts.isNamedExports).elements; _i < _a.length; _i++) {
+                var specifier = _a[_i];
+                if (!uniqueExports.get(ts.idText(specifier.name))) {
+                    var name = specifier.propertyName || specifier.name;
+                    if (!node.moduleSpecifier) {
+                        exportSpecifiers.add(ts.idText(name), specifier);
+                    }
+                    var decl = resolver.getReferencedImportDeclaration(name)
+                        || resolver.getReferencedValueDeclaration(name);
+                    if (decl) {
+                        multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(decl), specifier.name);
+                    }
+                    uniqueExports.set(ts.idText(specifier.name), true);
+                    exportedNames = ts.append(exportedNames, specifier.name);
+                }
+            }
+        }
+    }
+    ts.collectExternalModuleInfo = collectExternalModuleInfo;
+    function collectExportedVariableInfo(decl, uniqueExports, exportedNames) {
+        if (ts.isBindingPattern(decl.name)) {
+            for (var _i = 0, _a = decl.name.elements; _i < _a.length; _i++) {
+                var element = _a[_i];
+                if (!ts.isOmittedExpression(element)) {
+                    exportedNames = collectExportedVariableInfo(element, uniqueExports, exportedNames);
+                }
+            }
+        }
+        else if (!ts.isGeneratedIdentifier(decl.name)) {
+            var text = ts.idText(decl.name);
+            if (!uniqueExports.get(text)) {
+                uniqueExports.set(text, true);
+                exportedNames = ts.append(exportedNames, decl.name);
+            }
+        }
+        return exportedNames;
+    }
+    /** Use a sparse array as a multi-map. */
+    function multiMapSparseArrayAdd(map, key, value) {
+        var values = map[key];
+        if (values) {
+            values.push(value);
+        }
+        else {
+            map[key] = values = [value];
+        }
+        return values;
+    }
+    /**
+     * Used in the module transformer to check if an expression is reasonably without sideeffect,
+     *  and thus better to copy into multiple places rather than to cache in a temporary variable
+     *  - this is mostly subjective beyond the requirement that the expression not be sideeffecting
+     */
+    function isSimpleCopiableExpression(expression) {
+        return ts.isStringLiteralLike(expression) ||
+            expression.kind === 8 /* SyntaxKind.NumericLiteral */ ||
+            ts.isKeyword(expression.kind) ||
+            ts.isIdentifier(expression);
+    }
+    ts.isSimpleCopiableExpression = isSimpleCopiableExpression;
+    /**
+     * A simple inlinable expression is an expression which can be copied into multiple locations
+     * without risk of repeating any sideeffects and whose value could not possibly change between
+     * any such locations
+     */
+    function isSimpleInlineableExpression(expression) {
+        return !ts.isIdentifier(expression) && isSimpleCopiableExpression(expression);
+    }
+    ts.isSimpleInlineableExpression = isSimpleInlineableExpression;
+    function isCompoundAssignment(kind) {
+        return kind >= 64 /* SyntaxKind.FirstCompoundAssignment */
+            && kind <= 78 /* SyntaxKind.LastCompoundAssignment */;
+    }
+    ts.isCompoundAssignment = isCompoundAssignment;
+    function getNonAssignmentOperatorForCompoundAssignment(kind) {
+        switch (kind) {
+            case 64 /* SyntaxKind.PlusEqualsToken */: return 39 /* SyntaxKind.PlusToken */;
+            case 65 /* SyntaxKind.MinusEqualsToken */: return 40 /* SyntaxKind.MinusToken */;
+            case 66 /* SyntaxKind.AsteriskEqualsToken */: return 41 /* SyntaxKind.AsteriskToken */;
+            case 67 /* SyntaxKind.AsteriskAsteriskEqualsToken */: return 42 /* SyntaxKind.AsteriskAsteriskToken */;
+            case 68 /* SyntaxKind.SlashEqualsToken */: return 43 /* SyntaxKind.SlashToken */;
+            case 69 /* SyntaxKind.PercentEqualsToken */: return 44 /* SyntaxKind.PercentToken */;
+            case 70 /* SyntaxKind.LessThanLessThanEqualsToken */: return 47 /* SyntaxKind.LessThanLessThanToken */;
+            case 71 /* SyntaxKind.GreaterThanGreaterThanEqualsToken */: return 48 /* SyntaxKind.GreaterThanGreaterThanToken */;
+            case 72 /* SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken */: return 49 /* SyntaxKind.GreaterThanGreaterThanGreaterThanToken */;
+            case 73 /* SyntaxKind.AmpersandEqualsToken */: return 50 /* SyntaxKind.AmpersandToken */;
+            case 74 /* SyntaxKind.BarEqualsToken */: return 51 /* SyntaxKind.BarToken */;
+            case 78 /* SyntaxKind.CaretEqualsToken */: return 52 /* SyntaxKind.CaretToken */;
+            case 75 /* SyntaxKind.BarBarEqualsToken */: return 56 /* SyntaxKind.BarBarToken */;
+            case 76 /* SyntaxKind.AmpersandAmpersandEqualsToken */: return 55 /* SyntaxKind.AmpersandAmpersandToken */;
+            case 77 /* SyntaxKind.QuestionQuestionEqualsToken */: return 60 /* SyntaxKind.QuestionQuestionToken */;
+        }
+    }
+    ts.getNonAssignmentOperatorForCompoundAssignment = getNonAssignmentOperatorForCompoundAssignment;
+    /**
+     * @returns Contained super() call from descending into the statement ignoring parentheses, if that call exists.
+     */
+    function getSuperCallFromStatement(statement) {
+        if (!ts.isExpressionStatement(statement)) {
+            return undefined;
+        }
+        var expression = ts.skipParentheses(statement.expression);
+        return ts.isSuperCall(expression)
+            ? expression
+            : undefined;
+    }
+    ts.getSuperCallFromStatement = getSuperCallFromStatement;
+    /**
+     * @returns The index (after prologue statements) of a super call, or -1 if not found.
+     */
+    function findSuperStatementIndex(statements, indexAfterLastPrologueStatement) {
+        for (var i = indexAfterLastPrologueStatement; i < statements.length; i += 1) {
+            var statement = statements[i];
+            if (getSuperCallFromStatement(statement)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    ts.findSuperStatementIndex = findSuperStatementIndex;
+    function getProperties(node, requireInitializer, isStatic) {
+        return ts.filter(node.members, function (m) { return isInitializedOrStaticProperty(m, requireInitializer, isStatic); });
+    }
+    ts.getProperties = getProperties;
+    function isStaticPropertyDeclarationOrClassStaticBlockDeclaration(element) {
+        return isStaticPropertyDeclaration(element) || ts.isClassStaticBlockDeclaration(element);
+    }
+    function getStaticPropertiesAndClassStaticBlock(node) {
+        return ts.filter(node.members, isStaticPropertyDeclarationOrClassStaticBlockDeclaration);
+    }
+    ts.getStaticPropertiesAndClassStaticBlock = getStaticPropertiesAndClassStaticBlock;
+    /**
+     * Is a class element either a static or an instance property declaration with an initializer?
+     *
+     * @param member The class element node.
+     * @param isStatic A value indicating whether the member should be a static or instance member.
+     */
+    function isInitializedOrStaticProperty(member, requireInitializer, isStatic) {
+        return ts.isPropertyDeclaration(member)
+            && (!!member.initializer || !requireInitializer)
+            && ts.hasStaticModifier(member) === isStatic;
+    }
+    function isStaticPropertyDeclaration(member) {
+        return ts.isPropertyDeclaration(member) && ts.hasStaticModifier(member);
+    }
+    /**
+     * Gets a value indicating whether a class element is either a static or an instance property declaration with an initializer.
+     *
+     * @param member The class element node.
+     * @param isStatic A value indicating whether the member should be a static or instance member.
+     */
+    function isInitializedProperty(member) {
+        return member.kind === 169 /* SyntaxKind.PropertyDeclaration */
+            && member.initializer !== undefined;
+    }
+    ts.isInitializedProperty = isInitializedProperty;
+    /**
+     * Gets a value indicating whether a class element is a private instance method or accessor.
+     *
+     * @param member The class element node.
+     */
+    function isNonStaticMethodOrAccessorWithPrivateName(member) {
+        return !ts.isStatic(member) && (ts.isMethodOrAccessor(member) || ts.isAutoAccessorPropertyDeclaration(member)) && ts.isPrivateIdentifier(member.name);
+    }
+    ts.isNonStaticMethodOrAccessorWithPrivateName = isNonStaticMethodOrAccessorWithPrivateName;
+    /**
+     * Gets an array of arrays of decorators for the parameters of a function-like node.
+     * The offset into the result array should correspond to the offset of the parameter.
+     *
+     * @param node The function-like node.
+     */
+    function getDecoratorsOfParameters(node) {
+        var decorators;
+        if (node) {
+            var parameters = node.parameters;
+            var firstParameterIsThis = parameters.length > 0 && ts.parameterIsThisKeyword(parameters[0]);
+            var firstParameterOffset = firstParameterIsThis ? 1 : 0;
+            var numParameters = firstParameterIsThis ? parameters.length - 1 : parameters.length;
+            for (var i = 0; i < numParameters; i++) {
+                var parameter = parameters[i + firstParameterOffset];
+                if (decorators || ts.hasDecorators(parameter)) {
+                    if (!decorators) {
+                        decorators = new Array(numParameters);
+                    }
+                    decorators[i] = ts.getDecorators(parameter);
+                }
+            }
+        }
+        return decorators;
+    }
+    /**
+     * Gets an AllDecorators object containing the decorators for the class and the decorators for the
+     * parameters of the constructor of the class.
+     *
+     * @param node The class node.
+     */
+    function getAllDecoratorsOfClass(node) {
+        var decorators = ts.getDecorators(node);
+        var parameters = getDecoratorsOfParameters(ts.getFirstConstructorWithBody(node));
+        if (!ts.some(decorators) && !ts.some(parameters)) {
+            return undefined;
+        }
+        return {
+            decorators: decorators,
+            parameters: parameters
+        };
+    }
+    ts.getAllDecoratorsOfClass = getAllDecoratorsOfClass;
+    /**
+     * Gets an AllDecorators object containing the decorators for the member and its parameters.
+     *
+     * @param parent The class node that contains the member.
+     * @param member The class member.
+     */
+    function getAllDecoratorsOfClassElement(member, parent) {
+        switch (member.kind) {
+            case 174 /* SyntaxKind.GetAccessor */:
+            case 175 /* SyntaxKind.SetAccessor */:
+                return getAllDecoratorsOfAccessors(member, parent);
+            case 171 /* SyntaxKind.MethodDeclaration */:
+                return getAllDecoratorsOfMethod(member);
+            case 169 /* SyntaxKind.PropertyDeclaration */:
+                return getAllDecoratorsOfProperty(member);
+            default:
+                return undefined;
+        }
+    }
+    ts.getAllDecoratorsOfClassElement = getAllDecoratorsOfClassElement;
+    /**
+     * Gets an AllDecorators object containing the decorators for the accessor and its parameters.
+     *
+     * @param parent The class node that contains the accessor.
+     * @param accessor The class accessor member.
+     */
+    function getAllDecoratorsOfAccessors(accessor, parent) {
+        if (!accessor.body) {
+            return undefined;
+        }
+        var _a = ts.getAllAccessorDeclarations(parent.members, accessor), firstAccessor = _a.firstAccessor, secondAccessor = _a.secondAccessor, getAccessor = _a.getAccessor, setAccessor = _a.setAccessor;
+        var firstAccessorWithDecorators = ts.hasDecorators(firstAccessor) ? firstAccessor :
+            secondAccessor && ts.hasDecorators(secondAccessor) ? secondAccessor :
+                undefined;
+        if (!firstAccessorWithDecorators || accessor !== firstAccessorWithDecorators) {
+            return undefined;
+        }
+        var decorators = ts.getDecorators(firstAccessorWithDecorators);
+        var parameters = getDecoratorsOfParameters(setAccessor);
+        if (!ts.some(decorators) && !ts.some(parameters)) {
+            return undefined;
+        }
+        return {
+            decorators: decorators,
+            parameters: parameters,
+            getDecorators: getAccessor && ts.getDecorators(getAccessor),
+            setDecorators: setAccessor && ts.getDecorators(setAccessor)
+        };
+    }
+    /**
+     * Gets an AllDecorators object containing the decorators for the method and its parameters.
+     *
+     * @param method The class method member.
+     */
+    function getAllDecoratorsOfMethod(method) {
+        if (!method.body) {
+            return undefined;
+        }
+        var decorators = ts.getDecorators(method);
+        var parameters = getDecoratorsOfParameters(method);
+        if (!ts.some(decorators) && !ts.some(parameters)) {
+            return undefined;
+        }
+        return { decorators: decorators, parameters: parameters };
+    }
+    /**
+     * Gets an AllDecorators object containing the decorators for the property.
+     *
+     * @param property The class property member.
+     */
+    function getAllDecoratorsOfProperty(property) {
+        var decorators = ts.getDecorators(property);
+        if (!ts.some(decorators)) {
+            return undefined;
+        }
+        return { decorators: decorators };
+    }
+})(ts || (ts = {}));
+/*@internal*/
+var ts;
+(function (ts) {
+    var FlattenLevel;
+    (function (FlattenLevel) {
+        FlattenLevel[FlattenLevel["All"] = 0] = "All";
+        FlattenLevel[FlattenLevel["ObjectRest"] = 1] = "ObjectRest";
+    })(FlattenLevel = ts.FlattenLevel || (ts.FlattenLevel = {}));
+    /**
+     * Flattens a DestructuringAssignment or a VariableDeclaration to an expression.
+     *
+     * @param node The node to flatten.
+     * @param visitor An optional visitor used to visit initializers.
+     * @param context The transformation context.
+     * @param level Indicates the extent to which flattening should occur.
+     * @param needsValue An optional value indicating whether the value from the right-hand-side of
+     * the destructuring assignment is needed as part of a larger expression.
+     * @param createAssignmentCallback An optional callback used to create the assignment expression.
+     */
+    function flattenDestructuringAssignment(node, visitor, context, level, needsValue, createAssignmentCallback) {
+        var location = node;
+        var value;
+        if (ts.isDestructuringAssignment(node)) {
+            value = node.right;
+            while (ts.isEmptyArrayLiteral(node.left) || ts.isEmptyObjectLiteral(node.left)) {
+                if (ts.isDestructuringAssignment(value)) {
+                    location = node = value;
+                    value = node.right;
+                }
+                else {
+                    return ts.visitNode(value, visitor, ts.isExpression);
+                }
+            }
+        }
+        var expressions;
+        var flattenContext = {
+            context: context,
+            level: level,
+            downlevelIteration: !!context.getCompilerOptions().downlevelIteration,
+            hoistTempVariables: true,
+            emitExpression: emitExpression,
+            emitBindingOrAssignment: emitBindingOrAssignment,
+            createArrayBindingOrAssignmentPattern: function (elements) { return makeArrayAssignmentPattern(context.factory, elements); },
+            createObjectBindingOrAssignmentPattern: function (elements) { return makeObjectAssignmentPattern(context.factory, elements); },
+            createArrayBindingOrAssignmentElement: makeAssignmentElement,
+            visitor: visitor
+        };
+        if (value) {
+            value = ts.visitNode(value, visitor, ts.isExpression);
+            if (ts.isIdentifier(value) && bindingOrAssignmentElementAssignsToName(node, value.escapedText) ||
+                bindingOrAssignmentElementContainsNonLiteralComputedName(node)) {
+                // If the right-hand value of the assignment is also an assignment target then
+                // we need to cache the right-hand value.
+                value = ensureIdentifier(flattenContext, value, /*reuseIdentifierExpressions*/ false, location);
+            }
+            else if (needsValue) {
+                // If the right-hand value of the destructuring assignment needs to be preserved (as
+                // is the case when the destructuring assignment is part of a larger expression),
+                // then we need to cache the right-hand value.
+                //
+                // The source map location for the assignment should point to the entire binary
+                // expression.
+                value = ensureIdentifier(flattenContext, value, /*reuseIdentifierExpressions*/ true, location);
+            }
+            else if (ts.nodeIsSynthesized(node)) {
+                // Generally, the source map location for a destructuring assignment is the root
+                // expression.
+                //
+                // However, if the root expression is synthesized (as in the case
+                // of the initializer when transforming a ForOfStatement), then the source map
+                // location should point to the right-hand value of the expression.
+                location = value;
+            }
+        }
+        flattenBindingOrAssignmentElement(flattenContext, node, value, location, /*skipInitializer*/ ts.isDestructuringAssignment(node));
+        if (value && needsValue) {
+            if (!ts.some(expressions)) {
+                return value;
+            }
+            expressions.push(value);
+        }
+        return context.factory.inlineExpressions(expressions) || context.factory.createOmittedExpression();
+        function emitExpression(expression) {
+            expressions = ts.append(expressions, expression);
+        }
+        function emitBindingOrAssignment(target, value, location, original) {
+            ts.Debug.assertNode(target, createAssignmentCallback ? ts.isIdentifier : ts.isExpression);
+            var expression = createAssignmentCallback
+                ? createAssignmentCallback(target, value, location)
+                : ts.setTextRange(context.factory.createAssignment(ts.visitNode(target, visitor, ts.isExpression), value), location);
+            expression.original = original;
+            emitExpression(expression);
+        }
+    }
+    ts.flattenDestructuringAssignment = flattenDestructuringAssignment;
+    function bindingOrAssignmentElementAssignsToName(element, escapedName) {
+        var target = ts.getTargetOfBindingOrAssignmentElement(element); // TODO: GH#18217
+        if (ts.isBindingOrAssignmentPattern(target)) {
+            return bindingOrAssignmentPatternAssignsToName(target, escapedName);
+        }
+        else if (ts.isIdentifier(target)) {
+            return target.escapedText === escapedName;
+        }
+        return false;
+    }
+    function bindingOrAssignmentPatternAssignsToName(pattern, escapedName) {
+        var elements = ts.getElementsOfBindingOrAssignmentPattern(pattern);
+        for (var _i = 0, elements_4 = elements; _i < elements_4.length; _i++) {
+            var element = elements_4[_i];
+            if (bindingOrAssignmentElementAssignsToName(element, escapedName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    function bindingOrAssignmentElementContainsNonLiteralComputedName(element) {
+        var propertyName = ts.tryGetPropertyNameOfBindingOrAssignmentElement(element);
+        if (propertyName && ts.isComputedPropertyName(propertyName) && !ts.isLiteralExpression(propertyName.expression)) {
+            return true;
+        }
+        var target = ts.getTargetOfBindingOrAssignmentElement(element);
+        return !!target && ts.isBindingOrAssignmentPattern(target) && bindingOrAssignmentPatternContainsNonLiteralComputedName(target);
+    }
+    function bindingOrAssignmentPatternContainsNonLiteralComputedName(pattern) {
+        return !!ts.forEach(ts.getElementsOfBindingOrAssignmentPattern(pattern), bindingOrAssignmentElementContainsNonLiteralComputedName);
+    }
+    /**
+     * Flattens a VariableDeclaration or ParameterDeclaration to one or more variable declarations.
+     *
+     * @param node The node to flatten.
+     * @param visitor An optional visitor used to visit initializers.
+     * @param context The transformation context.
+     * @param boundValue The value bound to the declaration.
+     * @param skipInitializer A value indicating whether to ignore the initializer of `node`.
+     * @param hoistTempVariables Indicates whether temporary variables should not be recorded in-line.
+     * @param level Indicates the extent to which flattening should occur.
+     */
+    function flattenDestructuringBinding(node, visitor, context, level, rval, hoistTempVariables, skipInitializer) {
+        if (hoistTempVariables === void 0) { hoistTempVariables = false; }
+        var pendingExpressions;
+        var pendingDeclarations = [];
+        var declarations = [];
+        var flattenContext = {
+            context: context,
+            level: level,
+            downlevelIteration: !!context.getCompilerOptions().downlevelIteration,
+            hoistTempVariables: hoistTempVariables,
+            emitExpression: emitExpression,
+            emitBindingOrAssignment: emitBindingOrAssignment,
+            createArrayBindingOrAssignmentPattern: function (elements) { return makeArrayBindingPattern(context.factory, elements); },
+            createObjectBindingOrAssignmentPattern: function (elements) { return makeObjectBindingPattern(context.factory, elements); },
+            createArrayBindingOrAssignmentElement: function (name) { return makeBindingElement(context.factory, name); },
+            visitor: visitor
+        };
+        if (ts.isVariableDeclaration(node)) {
+            var initializer = ts.getInitializerOfBindingOrAssignmentElement(node);
+            if (initializer && (ts.isIdentifier(initializer) && bindingOrAssignmentElementAssignsToName(node, initializer.escapedText) ||
+                bindingOrAssignmentElementContainsNonLiteralComputedName(node))) {
+                // If the right-hand value of the assignment is also an assignment target then
+                // we need to cache the right-hand value.
+                initializer = ensureIdentifier(flattenContext, ts.visitNode(initializer, flattenContext.visitor), /*reuseIdentifierExpressions*/ false, initializer);
+                node = context.factory.updateVariableDeclaration(node, node.name, /*exclamationToken*/ undefined, /*type*/ undefined, initializer);
+            }
+        }
+        flattenBindingOrAssignmentElement(flattenContext, node, rval, node, skipInitializer);
+        if (pendingExpressions) {
+            var temp = context.factory.createTempVariable(/*recordTempVariable*/ undefined);
+            if (hoistTempVariables) {
+                var value = context.factory.inlineExpressions(pendingExpressions);
+                pendingExpressions = undefined;
+                emitBindingOrAssignment(temp, value, /*location*/ undefined, /*original*/ undefined);
+            }
+            else {
+                context.hoistVariableDeclaration(temp);
+                var pendingDeclaration = ts.last(pendingDeclarations);
+                pendingDeclaration.pendingExpressions = ts.append(pendingDeclaration.pendingExpressions, context.factory.createAssignment(temp, pendingDeclaration.value));
+                ts.addRange(pendingDeclaration.pendingExpressions, pendingExpressions);
+                pendingDeclaration.value = temp;
+            }
+        }
+        for (var _i = 0, pendingDeclarations_1 = pendingDeclarations; _i < pendingDeclarations_1.length; _i++) {
+            var _a = pendingDeclarations_1[_i], pendingExpressions_1 = _a.pendingExpressions, name = _a.name, value = _a.value, location = _a.location, original = _a.original;
+            var variable = context.factory.createVariableDeclaration(name, 
+            /*exclamationToken*/ undefined, 
+            /*type*/ undefined, pendingExpressions_1 ? context.factory.inlineExpressions(ts.append(pendingExpressions_1, value)) : value);
+            variable.original = original;
+            ts.setTextRange(variable, location);
+            declarations.push(variable);
+        }
+        return declarations;
+        function emitExpression(value) {
+            pendingExpressions = ts.append(pendingExpressions, value);
+        }
+        function emitBindingOrAssignment(target, value, location, original) {
+            ts.Debug.assertNode(target, ts.isBindingName);
+            if (pendingExpressions) {
+                value = context.factory.inlineExpressions(ts.append(pendingExpressions, value));
+                pendingExpressions = undefined;
+            }
+            pendingDeclarations.push({ pendingExpressions: pendingExpressions, name: target, value: value, location: location, original: original });
+        }
+    }
+    ts.flattenDestructuringBinding = flattenDestructuringBinding;
+    /**
+     * Flattens a BindingOrAssignmentElement into zero or more bindings or assignments.
+     *
+     * @param flattenContext Options used to control flattening.
+     * @param element The element to flatten.
+     * @param value The current RHS value to assign to the element.
+     * @param location The location to use for source maps and comments.
+     * @param skipInitializer An optional value indicating whether to include the initializer
+     * for the element.
+     */
+    function flattenBindingOrAssignmentElement(flattenContext, element, value, location, skipInitializer) {
+        var bindingTarget = ts.getTargetOfBindingOrAssignmentElement(element); // TODO: GH#18217
+        if (!skipInitializer) {
+            var initializer = ts.visitNode(ts.getInitializerOfBindingOrAssignmentElement(element), flattenContext.visitor, ts.isExpression);
+            if (initializer) {
+                // Combine value and initializer
+                if (value) {
+                    value = createDefaultValueCheck(flattenContext, value, initializer, location);
+                    // If 'value' is not a simple expression, it could contain side-effecting code that should evaluate before an object or array binding pattern.
+                    if (!ts.isSimpleInlineableExpression(initializer) && ts.isBindingOrAssignmentPattern(bindingTarget)) {
+                        value = ensureIdentifier(flattenContext, value, /*reuseIdentifierExpressions*/ true, location);
+                    }
+                }
+                else {
+                    value = initializer;
+                }
+            }
+            else if (!value) {
+                // Use 'void 0' in absence of value and initializer
+                value = flattenContext.context.factory.createVoidZero();
+            }
+        }
+        if (ts.isObjectBindingOrAssignmentPattern(bindingTarget)) {
+            flattenObjectBindingOrAssignmentPattern(flattenContext, element, bindingTarget, value, location);
+        }
+        else if (ts.isArrayBindingOrAssignmentPattern(bindingTarget)) {
+            flattenArrayBindingOrAssignmentPattern(flattenContext, element, bindingTarget, value, location);
+        }
+        else {
+            flattenContext.emitBindingOrAssignment(bindingTarget, value, location, /*original*/ element); // TODO: GH#18217
+        }
+    }
+    /**
+     * Flattens an ObjectBindingOrAssignmentPattern into zero or more bindings or assignments.
+     *
+     * @param flattenContext Options used to control flattening.
+     * @param parent The parent element of the pattern.
+     * @param pattern The ObjectBindingOrAssignmentPattern to flatten.
+     * @param value The current RHS value to assign to the element.
+     * @param location The location to use for source maps and comments.
+     */
+    function flattenObjectBindingOrAssignmentPattern(flattenContext, parent, pattern, value, location) {
+        var elements = ts.getElementsOfBindingOrAssignmentPattern(pattern);
+        var numElements = elements.length;
+        if (numElements !== 1) {
+            // For anything other than a single-element destructuring we need to generate a temporary
+            // to ensure value is evaluated exactly once. Additionally, if we have zero elements
+            // we need to emit *something* to ensure that in case a 'var' keyword was already emitted,
+            // so in that case, we'll intentionally create that temporary.
+            var reuseIdentifierExpressions = !ts.isDeclarationBindingElement(parent) || numElements !== 0;
+            value = ensureIdentifier(flattenContext, value, reuseIdentifierExpressions, location);
+        }
+        var bindingElements;
+        var computedTempVariables;
+        for (var i = 0; i < numElements; i++) {
+            var element = elements[i];
+            if (!ts.getRestIndicatorOfBindingOrAssignmentElement(element)) {
+                var propertyName = ts.getPropertyNameOfBindingOrAssignmentElement(element);
+                if (flattenContext.level >= 1 /* FlattenLevel.ObjectRest */
+                    && !(element.transformFlags & (32768 /* TransformFlags.ContainsRestOrSpread */ | 65536 /* TransformFlags.ContainsObjectRestOrSpread */))
+                    && !(ts.getTargetOfBindingOrAssignmentElement(element).transformFlags & (32768 /* TransformFlags.ContainsRestOrSpread */ | 65536 /* TransformFlags.ContainsObjectRestOrSpread */))
+                    && !ts.isComputedPropertyName(propertyName)) {
+                    bindingElements = ts.append(bindingElements, ts.visitNode(element, flattenContext.visitor));
+                }
+                else {
+                    if (bindingElements) {
+                        flattenContext.emitBindingOrAssignment(flattenContext.createObjectBindingOrAssignmentPattern(bindingElements), value, location, pattern);
+                        bindingElements = undefined;
+                    }
+                    var rhsValue = createDestructuringPropertyAccess(flattenContext, value, propertyName);
+                    if (ts.isComputedPropertyName(propertyName)) {
+                        computedTempVariables = ts.append(computedTempVariables, rhsValue.argumentExpression);
+                    }
+                    flattenBindingOrAssignmentElement(flattenContext, element, rhsValue, /*location*/ element);
+                }
+            }
+            else if (i === numElements - 1) {
+                if (bindingElements) {
+                    flattenContext.emitBindingOrAssignment(flattenContext.createObjectBindingOrAssignmentPattern(bindingElements), value, location, pattern);
+                    bindingElements = undefined;
+                }
+                var rhsValue = flattenContext.context.getEmitHelperFactory().createRestHelper(value, elements, computedTempVariables, pattern);
+                flattenBindingOrAssignmentElement(flattenContext, element, rhsValue, element);
+            }
+        }
+        if (bindingElements) {
+            flattenContext.emitBindingOrAssignment(flattenContext.createObjectBindingOrAssignmentPattern(bindingElements), value, location, pattern);
+        }
+    }
+    /**
+     * Flattens an ArrayBindingOrAssignmentPattern into zero or more bindings or assignments.
+     *
+     * @param flattenContext Options used to control flattening.
+     * @param parent The parent element of the pattern.
+     * @param pattern The ArrayBindingOrAssignmentPattern to flatten.
+     * @param value The current RHS value to assign to the element.
+     * @param location The location to use for source maps and comments.
+     */
+    function flattenArrayBindingOrAssignmentPattern(flattenContext, parent, pattern, value, location) {
+        var elements = ts.getElementsOfBindingOrAssignmentPattern(pattern);
+        var numElements = elements.length;
+        if (flattenContext.level < 1 /* FlattenLevel.ObjectRest */ && flattenContext.downlevelIteration) {
+            // Read the elements of the iterable into an array
+            value = ensureIdentifier(flattenContext, ts.setTextRange(flattenContext.context.getEmitHelperFactory().createReadHelper(value, numElements > 0 && ts.getRestIndicatorOfBindingOrAssignmentElement(elements[numElements - 1])
+                ? undefined
+                : numElements), location), 
+            /*reuseIdentifierExpressions*/ false, location);
+        }
+        else if (numElements !== 1 && (flattenContext.level < 1 /* FlattenLevel.ObjectRest */ || numElements === 0)
+            || ts.every(elements, ts.isOmittedExpression)) {
+            // For anything other than a single-element destructuring we need to generate a temporary
+            // to ensure value is evaluated exactly once. Additionally, if we have zero elements
+            // we need to emit *something* to ensure that in case a 'var' keyword was already emitted,
+            // so in that case, we'll intentionally create that temporary.
+            // Or all the elements of the binding pattern are omitted expression such as "var [,] = [1,2]",
+            // then we will create temporary variable.
+            var reuseIdentifierExpressions = !ts.isDeclarationBindingElement(parent) || numElements !== 0;
+            value = ensureIdentifier(flattenContext, value, reuseIdentifierExpressions, location);
+        }
+        var bindingElements;
+        var restContainingElements;
+        for (var i = 0; i < numElements; i++) {
+            var element = elements[i];
+            if (flattenContext.level >= 1 /* FlattenLevel.ObjectRest */) {
+                // If an array pattern contains an ObjectRest, we must cache the result so that we
+                // can perform the ObjectRest destructuring in a different declaration
+                if (element.transformFlags & 65536 /* TransformFlags.ContainsObjectRestOrSpread */ || flattenContext.hasTransformedPriorElement && !isSimpleBindingOrAssignmentElement(element)) {
+                    flattenContext.hasTransformedPriorElement = true;
+                    var temp = flattenContext.context.factory.createTempVariable(/*recordTempVariable*/ undefined);
+                    if (flattenContext.hoistTempVariables) {
+                        flattenContext.context.hoistVariableDeclaration(temp);
+                    }
+                    restContainingElements = ts.append(restContainingElements, [temp, element]);
+                    bindingElements = ts.append(bindingElements, flattenContext.createArrayBindingOrAssignmentElement(temp));
+                }
+                else {
+                    bindingElements = ts.append(bindingElements, element);
+                }
+            }
+            else if (ts.isOmittedExpression(element)) {
+                continue;
+            }
+            else if (!ts.getRestIndicatorOfBindingOrAssignmentElement(element)) {
+                var rhsValue = flattenContext.context.factory.createElementAccessExpression(value, i);
+                flattenBindingOrAssignmentElement(flattenContext, element, rhsValue, /*location*/ element);
+            }
+            else if (i === numElements - 1) {
+                var rhsValue = flattenContext.context.factory.createArraySliceCall(value, i);
+                flattenBindingOrAssignmentElement(flattenContext, element, rhsValue, /*location*/ element);
+            }
+        }
+        if (bindingElements) {
+            flattenContext.emitBindingOrAssignment(flattenContext.createArrayBindingOrAssignmentPattern(bindingElements), value, location, pattern);
+        }
+        if (restContainingElements) {
+            for (var _i = 0, restContainingElements_1 = restContainingElements; _i < restContainingElements_1.length; _i++) {
+                var _a = restContainingElements_1[_i], id = _a[0], element = _a[1];
+                flattenBindingOrAssignmentElement(flattenContext, element, id, element);
+            }
+        }
+    }
+    function isSimpleBindingOrAssignmentElement(element) {
+        var target = ts.getTargetOfBindingOrAssignmentElement(element);
+        if (!target || ts.isOmittedExpression(target))
+            return true;
+        var propertyName = ts.tryGetPropertyNameOfBindingOrAssignmentElement(element);
+        if (propertyName && !ts.isPropertyNameLiteral(propertyName))
+            return false;
+        var initializer = ts.getInitializerOfBindingOrAssignmentElement(element);
+        if (initializer && !ts.isSimpleInlineableExpression(initializer))
+            return false;
+        if (ts.isBindingOrAssignmentPattern(target))
+            return ts.every(ts.getElementsOfBindingOrAssignmentPattern(target), isSimpleBindingOrAssignmentElement);
+        return ts.isIdentifier(target);
+    }
+    /**
+     * Creates an expression used to provide a default value if a value is `undefined` at runtime.
+     *
+     * @param flattenContext Options used to control flattening.
+     * @param value The RHS value to test.
+     * @param defaultValue The default value to use if `value` is `undefined` at runtime.
+     * @param location The location to use for source maps and comments.
+     */
+    function createDefaultValueCheck(flattenContext, value, defaultValue, location) {
+        value = ensureIdentifier(flattenContext, value, /*reuseIdentifierExpressions*/ true, location);
+        return flattenContext.context.factory.createConditionalExpression(flattenContext.context.factory.createTypeCheck(value, "undefined"), /*questionToken*/ undefined, defaultValue, /*colonToken*/ undefined, value);
+    }
+    /**
+     * Creates either a PropertyAccessExpression or an ElementAccessExpression for the
+     * right-hand side of a transformed destructuring assignment.
+     *
+     * @link https://tc39.github.io/ecma262/#sec-runtime-semantics-keyeddestructuringassignmentevaluation
+     *
+     * @param flattenContext Options used to control flattening.
+     * @param value The RHS value that is the source of the property.
+     * @param propertyName The destructuring property name.
+     */
+    function createDestructuringPropertyAccess(flattenContext, value, propertyName) {
+        if (ts.isComputedPropertyName(propertyName)) {
+            var argumentExpression = ensureIdentifier(flattenContext, ts.visitNode(propertyName.expression, flattenContext.visitor), /*reuseIdentifierExpressions*/ false, /*location*/ propertyName);
+            return flattenContext.context.factory.createElementAccessExpression(value, argumentExpression);
+        }
+        else if (ts.isStringOrNumericLiteralLike(propertyName)) {
+            var argumentExpression = ts.factory.cloneNode(propertyName);
+            return flattenContext.context.factory.createElementAccessExpression(value, argumentExpression);
+        }
+        else {
+            var name = flattenContext.context.factory.createIdentifier(ts.idText(propertyName));
+            return flattenContext.context.factory.createPropertyAccessExpression(value, name);
+        }
+    }
+    /**
+     * Ensures that there exists a declared identifier whose value holds the given expression.
+     * This function is useful to ensure that the expression's value can be read from in subsequent expressions.
+     * Unless 'reuseIdentifierExpressions' is false, 'value' will be returned if it is just an identifier.
+     *
+     * @param flattenContext Options used to control flattening.
+     * @param value the expression whose value needs to be bound.
+     * @param reuseIdentifierExpressions true if identifier expressions can simply be returned;
+     * false if it is necessary to always emit an identifier.
+     * @param location The location to use for source maps and comments.
+     */
+    function ensureIdentifier(flattenContext, value, reuseIdentifierExpressions, location) {
+        if (ts.isIdentifier(value) && reuseIdentifierExpressions) {
+            return value;
+        }
+        else {
+            var temp = flattenContext.context.factory.createTempVariable(/*recordTempVariable*/ undefined);
+            if (flattenContext.hoistTempVariables) {
+                flattenContext.context.hoistVariableDeclaration(temp);
+                flattenContext.emitExpression(ts.setTextRange(flattenContext.context.factory.createAssignment(temp, value), location));
+            }
+            else {
+                flattenContext.emitBindingOrAssignment(temp, value, location, /*original*/ undefined);
+            }
+            return temp;
+        }
+    }
+    function makeArrayBindingPattern(factory, elements) {
+        ts.Debug.assertEachNode(elements, ts.isArrayBindingElement);
+        return factory.createArrayBindingPattern(elements);
+    }
+    function makeArrayAssignmentPattern(factory, elements) {
+        return factory.createArrayLiteralExpression(ts.map(elements, factory.converters.convertToArrayAssignmentElement));
+    }
+    function makeObjectBindingPattern(factory, elements) {
+        ts.Debug.assertEachNode(elements, ts.isBindingElement);
+        return factory.createObjectBindingPattern(elements);
+    }
+    function makeObjectAssignmentPattern(factory, elements) {
+        return factory.createObjectLiteralExpression(ts.map(elements, factory.converters.convertToObjectAssignmentElement));
+    }
+    function makeBindingElement(factory, name) {
+        return factory.createBindingElement(/*dotDotDotToken*/ undefined, /*propertyName*/ undefined, name);
+    }
+    function makeAssignmentElement(name) {
+        return name;
+    }
+})(ts || (ts = {}));
+/*@internal*/
+var ts;
+(function (ts) {
+    var ProcessLevel;
+    (function (ProcessLevel) {
+        ProcessLevel[ProcessLevel["LiftRestriction"] = 0] = "LiftRestriction";
+        ProcessLevel[ProcessLevel["All"] = 1] = "All";
+    })(ProcessLevel = ts.ProcessLevel || (ts.ProcessLevel = {}));
+    function processTaggedTemplateExpression(context, node, visitor, currentSourceFile, recordTaggedTemplateString, level) {
+        // Visit the tag expression
+        var tag = ts.visitNode(node.tag, visitor, ts.isExpression);
+        // Build up the template arguments and the raw and cooked strings for the template.
+        // We start out with 'undefined' for the first argument and revisit later
+        // to avoid walking over the template string twice and shifting all our arguments over after the fact.
+        var templateArguments = [undefined];
+        var cookedStrings = [];
+        var rawStrings = [];
+        var template = node.template;
+        if (level === ProcessLevel.LiftRestriction && !ts.hasInvalidEscape(template)) {
+            return ts.visitEachChild(node, visitor, context);
+        }
+        if (ts.isNoSubstitutionTemplateLiteral(template)) {
+            cookedStrings.push(createTemplateCooked(template));
+            rawStrings.push(getRawLiteral(template, currentSourceFile));
+        }
+        else {
+            cookedStrings.push(createTemplateCooked(template.head));
+            rawStrings.push(getRawLiteral(template.head, currentSourceFile));
+            for (var _i = 0, _a = template.templateSpans; _i < _a.length; _i++) {
+                var templateSpan = _a[_i];
+                cookedStrings.push(createTemplateCooked(templateSpan.literal));
+                rawStrings.push(getRawLiteral(templateSpan.literal, currentSourceFile));
+                templateArguments.push(ts.visitNode(templateSpan.expression, visitor, ts.isExpression));
+            }
+        }
+        var helperCall = context.getEmitHelperFactory().createTemplateObjectHelper(ts.factory.createArrayLiteralExpression(cookedStrings), ts.factory.createArrayLiteralExpression(rawStrings));
+        // Create a variable to cache the template object if we're in a module.
+        // Do not do this in the global scope, as any variable we currently generate could conflict with
+        // variables from outside of the current compilation. In the future, we can revisit this behavior.
+        if (ts.isExternalModule(currentSourceFile)) {
+            var tempVar = ts.factory.createUniqueName("templateObject");
+            recordTaggedTemplateString(tempVar);
+            templateArguments[0] = ts.factory.createLogicalOr(tempVar, ts.factory.createAssignment(tempVar, helperCall));
+        }
+        else {
+            templateArguments[0] = helperCall;
+        }
+        return ts.factory.createCallExpression(tag, /*typeArguments*/ undefined, templateArguments);
+    }
+    ts.processTaggedTemplateExpression = processTaggedTemplateExpression;
+    function createTemplateCooked(template) {
+        return template.templateFlags ? ts.factory.createVoidZero() : ts.factory.createStringLiteral(template.text);
+    }
+    /**
+     * Creates an ES5 compatible literal from an ES6 template literal.
+     *
+     * @param node The ES6 template literal.
+     */
+    function getRawLiteral(node, currentSourceFile) {
+        // Find original source text, since we need to emit the raw strings of the tagged template.
+        // The raw strings contain the (escaped) strings of what the user wrote.
+        // Examples: `\n` is converted to "\\n", a template string with a newline to "\n".
+        var text = node.rawText;
+        if (text === undefined) {
+            ts.Debug.assertIsDefined(currentSourceFile, "Template literal node is missing 'rawText' and does not have a source file. Possibly bad transform.");
+            text = ts.getSourceTextOfNodeFromSourceFile(currentSourceFile, node);
+            // text contains the original source, it will also contain quotes ("`"), dolar signs and braces ("${" and "}"),
+            // thus we need to remove those characters.
+            // First template piece starts with "`", others with "}"
+            // Last template piece ends with "`", others with "${"
+            var isLast = node.kind === 14 /* SyntaxKind.NoSubstitutionTemplateLiteral */ || node.kind === 17 /* SyntaxKind.TemplateTail */;
+            text = text.substring(1, text.length - (isLast ? 1 : 2));
+        }
+        // Newline normalization:
+        // ES6 Spec 11.8.6.1 - Static Semantics of TV's and TRV's
+        // <CR><LF> and <CR> LineTerminatorSequences are normalized to <LF> for both TV and TRV.
+        text = text.replace(/\r\n?/g, "\n");
+        return ts.setTextRange(ts.factory.createStringLiteral(text), node);
+    }
+})(ts || (ts = {}));
+/*@internal*/
+var ts;
+(function (ts) {
+    /**
+     * Indicates whether to emit type metadata in the new format.
+     */
+    var USE_NEW_TYPE_METADATA_FORMAT = false;
+    var TypeScriptSubstitutionFlags;
+    (function (TypeScriptSubstitutionFlags) {
+        /** Enables substitutions for namespace exports. */
+        TypeScriptSubstitutionFlags[TypeScriptSubstitutionFlags["NamespaceExports"] = 2] = "NamespaceExports";
+        /* Enables substitutions for unqualified enum members */
+        TypeScriptSubstitutionFlags[TypeScriptSubstitutionFlags["NonQualifiedEnumMembers"] = 8] = "NonQualifiedEnumMembers";
+    })(TypeScriptSubstitutionFlags || (TypeScriptSubstitutionFlags = {}));
+    var ClassFacts;
+    (function (ClassFacts) {
+        ClassFacts[ClassFacts["None"] = 0] = "None";
+        ClassFacts[ClassFacts["HasStaticInitializedProperties"] = 1] = "HasStaticInitializedProperties";
+        ClassFacts[ClassFacts["HasConstructorDecorators"] = 2] = "HasConstructorDecorators";
+        ClassFacts[ClassFacts["HasMemberDecorators"] = 4] = "HasMemberDecorators";
+        ClassFacts[ClassFacts["IsExportOfNamespace"] = 8] = "IsExportOfNamespace";
+        ClassFacts[ClassFacts["IsNamedExternalExport"] = 16] = "IsNamedExternalExport";
+        ClassFacts[ClassFacts["IsDefaultExternalExport"] = 32] = "IsDefaultExternalExport";
+        ClassFacts[ClassFacts["IsDerivedClass"] = 64] = "IsDerivedClass";
+        ClassFacts[ClassFacts["UseImmediatelyInvokedFunctionExpression"] = 128] = "UseImmediatelyInvokedFunctionExpression";
+        ClassFacts[ClassFacts["HasAnyDecorators"] = 6] = "HasAnyDecorators";
+        ClassFacts[ClassFacts["NeedsName"] = 5] = "NeedsName";
+        ClassFacts[ClassFacts["MayNeedImmediatelyInvokedFunctionExpression"] = 7] = "MayNeedImmediatelyInvokedFunctionExpression";
+        ClassFacts[ClassFacts["IsExported"] = 56] = "IsExported";
+    })(ClassFacts || (ClassFacts = {}));
+    function transformTypeScript(context) {
+        var factory = context.factory, emitHelpers = context.getEmitHelperFactory, startLexicalEnvironment = context.startLexicalEnvironment, resumeLexicalEnvironment = context.resumeLexicalEnvironment, endLexicalEnvironment = context.endLexicalEnvironment, hoistVariableDeclaration = context.hoistVariableDeclaration;
+        var resolver = context.getEmitResolver();
+        var compilerOptions = context.getCompilerOptions();
+        var languageVersion = ts.getEmitScriptTarget(compilerOptions);
+        var moduleKind = ts.getEmitModuleKind(compilerOptions);
+        var typeSerializer = compilerOptions.emitDecoratorMetadata ? ts.createRuntimeTypeSerializer(context) : undefined;
+        // Save the previous transformation hooks.
+        var previousOnEmitNode = context.onEmitNode;
+        var previousOnSubstituteNode = context.onSubstituteNode;
+        // Set new transformation hooks.
+        context.onEmitNode = onEmitNode;
+        context.onSubstituteNode = onSubstituteNode;
+        // Enable substitution for property/element access to emit const enum values.
+        context.enableSubstitution(208 /* SyntaxKind.PropertyAccessExpression */);
+        context.enableSubstitution(209 /* SyntaxKind.ElementAccessExpression */);
+        // These variables contain state that changes as we descend into the tree.
+        var currentSourceFile;
+        var currentNamespace;
+        var currentNamespaceContainerName;
+        var currentLexicalScope;
+        var currentScopeFirstDeclarationsOfName;
+        var currentClassHasParameterProperties;
+        /**
+         * Keeps track of whether expression substitution has been enabled for specific edge cases.
+         * They are persisted between each SourceFile transformation and should not be reset.
+         */
+        var enabledSubstitutions;
+        /**
+         * Keeps track of whether we are within any containing namespaces when performing
+         * just-in-time substitution while printing an expression identifier.
+         */
+        var applicableSubstitutions;
+        return transformSourceFileOrBundle;
+        function transformSourceFileOrBundle(node) {
+            if (node.kind === 309 /* SyntaxKind.Bundle */) {
+                return transformBundle(node);
+            }
+            return transformSourceFile(node);
+        }
+        function transformBundle(node) {
+            return factory.createBundle(node.sourceFiles.map(transformSourceFile), ts.mapDefined(node.prepends, function (prepend) {
+                if (prepend.kind === 311 /* SyntaxKind.InputFiles */) {
+                    return ts.createUnparsedSourceFile(prepend, "js");
+                }
+                return prepend;
+            }));
+        }
+        /**
+         * Transform TypeScript-specific syntax in a SourceFile.
+         *
+         * @param node A SourceFile node.
+         */
+        function transformSourceFile(node) {
+            if (node.isDeclarationFile) {
+                return node;
+            }
+            currentSourceFile = node;
+            var visited = saveStateAndInvoke(node, visitSourceFile);
+            ts.addEmitHelpers(visited, context.readEmitHelpers());
+            currentSourceFile = undefined;
+            return visited;
+        }
+        /**
+         * Visits a node, saving and restoring state variables on the stack.
+         *
+         * @param node The node to visit.
+         */
+        function saveStateAndInvoke(node, f) {
+            // Save state
+            var savedCurrentScope = currentLexicalScope;
+            var savedCurrentScopeFirstDeclarationsOfName = currentScopeFirstDeclarationsOfName;
+            var savedCurrentClassHasParameterProperties = currentClassHasParameterProperties;
+            // Handle state changes before visiting a node.
+            onBeforeVisitNode(node);
+            var visited = f(node);
+            // Restore state
+            if (currentLexicalScope !== savedCurrentScope) {
+                currentScopeFirstDeclarationsOfName = savedCurrentScopeFirstDeclarationsOfName;
+            }
+            currentLexicalScope = savedCurrentScope;
+            currentClassHasParameterProperties = savedCurrentClassHasParameterProperties;
+            return visited;
+        }
+        /**
+         * Performs actions that should always occur immediately before visiting a node.
+         *
+         * @param node The node to visit.
+         */
+        function onBeforeVisitNode(node) {
+            switch (node.kind) {
+                case 308 /* SyntaxKind.SourceFile */:
+                case 266 /* SyntaxKind.CaseBlock */:
+                case 265 /* SyntaxKind.ModuleBlock */:
+                case 238 /* SyntaxKind.Block */:
+                    currentLexicalScope = node;
+                    currentScopeFirstDeclarationsOfName = undefined;
+                    break;
+                case 260 /* SyntaxKind.ClassDeclaration */:
+                case 259 /* SyntaxKind.FunctionDeclaration */:
+                    if (ts.hasSyntacticModifier(node, 2 /* ModifierFlags.Ambient */)) {
+                        break;
+                    }
+                    // Record these declarations provided that they 

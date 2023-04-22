@@ -1,0 +1,412 @@
+n undefined;
+            }
+            return node;
+        }
+        /**
+         * Branching visitor, visits a TypeScript syntax node.
+         *
+         * @param node The node to visit.
+         */
+        function visitTypeScript(node) {
+            if (ts.isStatement(node) && ts.hasSyntacticModifier(node, 2 /* ModifierFlags.Ambient */)) {
+                // TypeScript ambient declarations are elided, but some comments may be preserved.
+                // See the implementation of `getLeadingComments` in comments.ts for more details.
+                return factory.createNotEmittedStatement(node);
+            }
+            switch (node.kind) {
+                case 93 /* SyntaxKind.ExportKeyword */:
+                case 88 /* SyntaxKind.DefaultKeyword */:
+                    // ES6 export and default modifiers are elided when inside a namespace.
+                    return currentNamespace ? undefined : node;
+                case 123 /* SyntaxKind.PublicKeyword */:
+                case 121 /* SyntaxKind.PrivateKeyword */:
+                case 122 /* SyntaxKind.ProtectedKeyword */:
+                case 126 /* SyntaxKind.AbstractKeyword */:
+                case 161 /* SyntaxKind.OverrideKeyword */:
+                case 85 /* SyntaxKind.ConstKeyword */:
+                case 136 /* SyntaxKind.DeclareKeyword */:
+                case 146 /* SyntaxKind.ReadonlyKeyword */:
+                case 101 /* SyntaxKind.InKeyword */:
+                case 145 /* SyntaxKind.OutKeyword */:
+                // TypeScript accessibility and readonly modifiers are elided
+                // falls through
+                case 185 /* SyntaxKind.ArrayType */:
+                case 186 /* SyntaxKind.TupleType */:
+                case 187 /* SyntaxKind.OptionalType */:
+                case 188 /* SyntaxKind.RestType */:
+                case 184 /* SyntaxKind.TypeLiteral */:
+                case 179 /* SyntaxKind.TypePredicate */:
+                case 165 /* SyntaxKind.TypeParameter */:
+                case 131 /* SyntaxKind.AnyKeyword */:
+                case 157 /* SyntaxKind.UnknownKeyword */:
+                case 134 /* SyntaxKind.BooleanKeyword */:
+                case 152 /* SyntaxKind.StringKeyword */:
+                case 148 /* SyntaxKind.NumberKeyword */:
+                case 144 /* SyntaxKind.NeverKeyword */:
+                case 114 /* SyntaxKind.VoidKeyword */:
+                case 153 /* SyntaxKind.SymbolKeyword */:
+                case 182 /* SyntaxKind.ConstructorType */:
+                case 181 /* SyntaxKind.FunctionType */:
+                case 183 /* SyntaxKind.TypeQuery */:
+                case 180 /* SyntaxKind.TypeReference */:
+                case 189 /* SyntaxKind.UnionType */:
+                case 190 /* SyntaxKind.IntersectionType */:
+                case 191 /* SyntaxKind.ConditionalType */:
+                case 193 /* SyntaxKind.ParenthesizedType */:
+                case 194 /* SyntaxKind.ThisType */:
+                case 195 /* SyntaxKind.TypeOperator */:
+                case 196 /* SyntaxKind.IndexedAccessType */:
+                case 197 /* SyntaxKind.MappedType */:
+                case 198 /* SyntaxKind.LiteralType */:
+                // TypeScript type nodes are elided.
+                // falls through
+                case 178 /* SyntaxKind.IndexSignature */:
+                    // TypeScript index signatures are elided.
+                    return undefined;
+                case 262 /* SyntaxKind.TypeAliasDeclaration */:
+                    // TypeScript type-only declarations are elided.
+                    return factory.createNotEmittedStatement(node);
+                case 267 /* SyntaxKind.NamespaceExportDeclaration */:
+                    // TypeScript namespace export declarations are elided.
+                    return undefined;
+                case 261 /* SyntaxKind.InterfaceDeclaration */:
+                    // TypeScript interfaces are elided, but some comments may be preserved.
+                    // See the implementation of `getLeadingComments` in comments.ts for more details.
+                    return factory.createNotEmittedStatement(node);
+                case 260 /* SyntaxKind.ClassDeclaration */:
+                    // This may be a class declaration with TypeScript syntax extensions.
+                    //
+                    // TypeScript class syntax extensions include:
+                    // - decorators
+                    // - optional `implements` heritage clause
+                    // - parameter property assignments in the constructor
+                    // - index signatures
+                    // - method overload signatures
+                    return visitClassDeclaration(node);
+                case 228 /* SyntaxKind.ClassExpression */:
+                    // This may be a class expression with TypeScript syntax extensions.
+                    //
+                    // TypeScript class syntax extensions include:
+                    // - decorators
+                    // - optional `implements` heritage clause
+                    // - parameter property assignments in the constructor
+                    // - index signatures
+                    // - method overload signatures
+                    return visitClassExpression(node);
+                case 294 /* SyntaxKind.HeritageClause */:
+                    // This may be a heritage clause with TypeScript syntax extensions.
+                    //
+                    // TypeScript heritage clause extensions include:
+                    // - `implements` clause
+                    return visitHeritageClause(node);
+                case 230 /* SyntaxKind.ExpressionWithTypeArguments */:
+                    // TypeScript supports type arguments on an expression in an `extends` heritage clause.
+                    return visitExpressionWithTypeArguments(node);
+                case 207 /* SyntaxKind.ObjectLiteralExpression */:
+                    return visitObjectLiteralExpression(node);
+                case 173 /* SyntaxKind.Constructor */:
+                case 169 /* SyntaxKind.PropertyDeclaration */:
+                case 171 /* SyntaxKind.MethodDeclaration */:
+                case 174 /* SyntaxKind.GetAccessor */:
+                case 175 /* SyntaxKind.SetAccessor */:
+                case 172 /* SyntaxKind.ClassStaticBlockDeclaration */:
+                    return ts.Debug.fail("Class and object literal elements must be visited with their respective visitors");
+                case 259 /* SyntaxKind.FunctionDeclaration */:
+                    // Typescript function declarations can have modifiers, decorators, and type annotations.
+                    return visitFunctionDeclaration(node);
+                case 215 /* SyntaxKind.FunctionExpression */:
+                    // TypeScript function expressions can have modifiers and type annotations.
+                    return visitFunctionExpression(node);
+                case 216 /* SyntaxKind.ArrowFunction */:
+                    // TypeScript arrow functions can have modifiers and type annotations.
+                    return visitArrowFunction(node);
+                case 166 /* SyntaxKind.Parameter */:
+                    // This may be a parameter declaration with TypeScript syntax extensions.
+                    //
+                    // TypeScript parameter declaration syntax extensions include:
+                    // - decorators
+                    // - accessibility modifiers
+                    // - the question mark (?) token for optional parameters
+                    // - type annotations
+                    // - this parameters
+                    return visitParameter(node);
+                case 214 /* SyntaxKind.ParenthesizedExpression */:
+                    // ParenthesizedExpressions are TypeScript if their expression is a
+                    // TypeAssertion or AsExpression
+                    return visitParenthesizedExpression(node);
+                case 213 /* SyntaxKind.TypeAssertionExpression */:
+                case 231 /* SyntaxKind.AsExpression */:
+                    // TypeScript type assertions are removed, but their subtrees are preserved.
+                    return visitAssertionExpression(node);
+                case 235 /* SyntaxKind.SatisfiesExpression */:
+                    return visitSatisfiesExpression(node);
+                case 210 /* SyntaxKind.CallExpression */:
+                    return visitCallExpression(node);
+                case 211 /* SyntaxKind.NewExpression */:
+                    return visitNewExpression(node);
+                case 212 /* SyntaxKind.TaggedTemplateExpression */:
+                    return visitTaggedTemplateExpression(node);
+                case 232 /* SyntaxKind.NonNullExpression */:
+                    // TypeScript non-null expressions are removed, but their subtrees are preserved.
+                    return visitNonNullExpression(node);
+                case 263 /* SyntaxKind.EnumDeclaration */:
+                    // TypeScript enum declarations do not exist in ES6 and must be rewritten.
+                    return visitEnumDeclaration(node);
+                case 240 /* SyntaxKind.VariableStatement */:
+                    // TypeScript namespace exports for variable statements must be transformed.
+                    return visitVariableStatement(node);
+                case 257 /* SyntaxKind.VariableDeclaration */:
+                    return visitVariableDeclaration(node);
+                case 264 /* SyntaxKind.ModuleDeclaration */:
+                    // TypeScript namespace declarations must be transformed.
+                    return visitModuleDeclaration(node);
+                case 268 /* SyntaxKind.ImportEqualsDeclaration */:
+                    // TypeScript namespace or external module import.
+                    return visitImportEqualsDeclaration(node);
+                case 282 /* SyntaxKind.JsxSelfClosingElement */:
+                    return visitJsxSelfClosingElement(node);
+                case 283 /* SyntaxKind.JsxOpeningElement */:
+                    return visitJsxJsxOpeningElement(node);
+                default:
+                    // node contains some other TypeScript syntax
+                    return ts.visitEachChild(node, visitor, context);
+            }
+        }
+        function visitSourceFile(node) {
+            var alwaysStrict = ts.getStrictOptionValue(compilerOptions, "alwaysStrict") &&
+                !(ts.isExternalModule(node) && moduleKind >= ts.ModuleKind.ES2015) &&
+                !ts.isJsonSourceFile(node);
+            return factory.updateSourceFile(node, ts.visitLexicalEnvironment(node.statements, sourceElementVisitor, context, /*start*/ 0, alwaysStrict));
+        }
+        function visitObjectLiteralExpression(node) {
+            return factory.updateObjectLiteralExpression(node, ts.visitNodes(node.properties, getObjectLiteralElementVisitor(node), ts.isObjectLiteralElement));
+        }
+        function getClassFacts(node, staticProperties) {
+            var facts = 0 /* ClassFacts.None */;
+            if (ts.some(staticProperties))
+                facts |= 1 /* ClassFacts.HasStaticInitializedProperties */;
+            var extendsClauseElement = ts.getEffectiveBaseTypeNode(node);
+            if (extendsClauseElement && ts.skipOuterExpressions(extendsClauseElement.expression).kind !== 104 /* SyntaxKind.NullKeyword */)
+                facts |= 64 /* ClassFacts.IsDerivedClass */;
+            if (ts.classOrConstructorParameterIsDecorated(node))
+                facts |= 2 /* ClassFacts.HasConstructorDecorators */;
+            if (ts.childIsDecorated(node))
+                facts |= 4 /* ClassFacts.HasMemberDecorators */;
+            if (isExportOfNamespace(node))
+                facts |= 8 /* ClassFacts.IsExportOfNamespace */;
+            else if (isDefaultExternalModuleExport(node))
+                facts |= 32 /* ClassFacts.IsDefaultExternalExport */;
+            else if (isNamedExternalModuleExport(node))
+                facts |= 16 /* ClassFacts.IsNamedExternalExport */;
+            if (languageVersion <= 1 /* ScriptTarget.ES5 */ && (facts & 7 /* ClassFacts.MayNeedImmediatelyInvokedFunctionExpression */))
+                facts |= 128 /* ClassFacts.UseImmediatelyInvokedFunctionExpression */;
+            return facts;
+        }
+        function hasTypeScriptClassSyntax(node) {
+            return !!(node.transformFlags & 8192 /* TransformFlags.ContainsTypeScriptClassSyntax */);
+        }
+        function isClassLikeDeclarationWithTypeScriptSyntax(node) {
+            return ts.hasDecorators(node)
+                || ts.some(node.typeParameters)
+                || ts.some(node.heritageClauses, hasTypeScriptClassSyntax)
+                || ts.some(node.members, hasTypeScriptClassSyntax);
+        }
+        function visitClassDeclaration(node) {
+            if (!isClassLikeDeclarationWithTypeScriptSyntax(node) && !(currentNamespace && ts.hasSyntacticModifier(node, 1 /* ModifierFlags.Export */))) {
+                return factory.updateClassDeclaration(node, ts.visitNodes(node.modifiers, modifierVisitor, ts.isModifier), node.name, 
+                /*typeParameters*/ undefined, ts.visitNodes(node.heritageClauses, visitor, ts.isHeritageClause), ts.visitNodes(node.members, getClassElementVisitor(node), ts.isClassElement));
+            }
+            var staticProperties = ts.getProperties(node, /*requireInitializer*/ true, /*isStatic*/ true);
+            var facts = getClassFacts(node, staticProperties);
+            if (facts & 128 /* ClassFacts.UseImmediatelyInvokedFunctionExpression */) {
+                context.startLexicalEnvironment();
+            }
+            var name = node.name || (facts & 5 /* ClassFacts.NeedsName */ ? factory.getGeneratedNameForNode(node) : undefined);
+            var allDecorators = ts.getAllDecoratorsOfClass(node);
+            var decorators = transformAllDecoratorsOfDeclaration(node, node, allDecorators);
+            // we do not emit modifiers on the declaration if we are emitting an IIFE
+            var modifiers = !(facts & 128 /* ClassFacts.UseImmediatelyInvokedFunctionExpression */)
+                ? ts.visitNodes(node.modifiers, modifierVisitor, ts.isModifier)
+                : ts.elideNodes(factory, node.modifiers); // preserve positions, if available
+            //  ${modifiers} class ${name} ${heritageClauses} {
+            //      ${members}
+            //  }
+            var classStatement = factory.updateClassDeclaration(node, ts.concatenate(decorators, modifiers), name, 
+            /*typeParameters*/ undefined, ts.visitNodes(node.heritageClauses, visitor, ts.isHeritageClause), transformClassMembers(node));
+            // To better align with the old emitter, we should not emit a trailing source map
+            // entry if the class has static properties.
+            var emitFlags = ts.getEmitFlags(node);
+            if (facts & 1 /* ClassFacts.HasStaticInitializedProperties */) {
+                emitFlags |= 32 /* EmitFlags.NoTrailingSourceMap */;
+            }
+            ts.setEmitFlags(classStatement, emitFlags);
+            var statements = [classStatement];
+            if (facts & 128 /* ClassFacts.UseImmediatelyInvokedFunctionExpression */) {
+                // When we emit a TypeScript class down to ES5, we must wrap it in an IIFE so that the
+                // 'es2015' transformer can properly nest static initializers and decorators. The result
+                // looks something like:
+                //
+                //  var C = function () {
+                //      class C {
+                //      }
+                //      C.static_prop = 1;
+                //      return C;
+                //  }();
+                //
+                var closingBraceLocation = ts.createTokenRange(ts.skipTrivia(currentSourceFile.text, node.members.end), 19 /* SyntaxKind.CloseBraceToken */);
+                var localName = factory.getInternalName(node);
+                // The following partially-emitted expression exists purely to align our sourcemap
+                // emit with the original emitter.
+                var outer = factory.createPartiallyEmittedExpression(localName);
+                ts.setTextRangeEnd(outer, closingBraceLocation.end);
+                ts.setEmitFlags(outer, 1536 /* EmitFlags.NoComments */);
+                var statement = factory.createReturnStatement(outer);
+                ts.setTextRangePos(statement, closingBraceLocation.pos);
+                ts.setEmitFlags(statement, 1536 /* EmitFlags.NoComments */ | 384 /* EmitFlags.NoTokenSourceMaps */);
+                statements.push(statement);
+                ts.insertStatementsAfterStandardPrologue(statements, context.endLexicalEnvironment());
+                var iife = factory.createImmediatelyInvokedArrowFunction(statements);
+                ts.setEmitFlags(iife, 33554432 /* EmitFlags.TypeScriptClassWrapper */);
+                var varStatement = factory.createVariableStatement(
+                /*modifiers*/ undefined, factory.createVariableDeclarationList([
+                    factory.createVariableDeclaration(factory.getLocalName(node, /*allowComments*/ false, /*allowSourceMaps*/ false), 
+                    /*exclamationToken*/ undefined, 
+                    /*type*/ undefined, iife)
+                ]));
+                ts.setOriginalNode(varStatement, node);
+                ts.setCommentRange(varStatement, node);
+                ts.setSourceMapRange(varStatement, ts.moveRangePastDecorators(node));
+                ts.startOnNewLine(varStatement);
+                statements = [varStatement];
+            }
+            // If the class is exported as part of a TypeScript namespace, emit the namespace export.
+            // Otherwise, if the class was exported at the top level and was decorated, emit an export
+            // declaration or export default for the class.
+            if (facts & 8 /* ClassFacts.IsExportOfNamespace */) {
+                addExportMemberAssignment(statements, node);
+            }
+            else if (facts & 128 /* ClassFacts.UseImmediatelyInvokedFunctionExpression */ || facts & 2 /* ClassFacts.HasConstructorDecorators */) {
+                if (facts & 32 /* ClassFacts.IsDefaultExternalExport */) {
+                    statements.push(factory.createExportDefault(factory.getLocalName(node, /*allowComments*/ false, /*allowSourceMaps*/ true)));
+                }
+                else if (facts & 16 /* ClassFacts.IsNamedExternalExport */) {
+                    statements.push(factory.createExternalModuleExport(factory.getLocalName(node, /*allowComments*/ false, /*allowSourceMaps*/ true)));
+                }
+            }
+            if (statements.length > 1) {
+                // Add a DeclarationMarker as a marker for the end of the declaration
+                statements.push(factory.createEndOfDeclarationMarker(node));
+                ts.setEmitFlags(classStatement, ts.getEmitFlags(classStatement) | 4194304 /* EmitFlags.HasEndOfDeclarationMarker */);
+            }
+            return ts.singleOrMany(statements);
+        }
+        function visitClassExpression(node) {
+            var allDecorators = ts.getAllDecoratorsOfClass(node);
+            var decorators = transformAllDecoratorsOfDeclaration(node, node, allDecorators);
+            return factory.updateClassExpression(node, decorators, node.name, 
+            /*typeParameters*/ undefined, ts.visitNodes(node.heritageClauses, visitor, ts.isHeritageClause), isClassLikeDeclarationWithTypeScriptSyntax(node) ?
+                transformClassMembers(node) :
+                ts.visitNodes(node.members, getClassElementVisitor(node), ts.isClassElement));
+        }
+        /**
+         * Transforms the members of a class.
+         *
+         * @param node The current class.
+         */
+        function transformClassMembers(node) {
+            var members = [];
+            var constructor = ts.getFirstConstructorWithBody(node);
+            var parametersWithPropertyAssignments = constructor &&
+                ts.filter(constructor.parameters, function (p) { return ts.isParameterPropertyDeclaration(p, constructor); });
+            if (parametersWithPropertyAssignments) {
+                for (var _i = 0, parametersWithPropertyAssignments_1 = parametersWithPropertyAssignments; _i < parametersWithPropertyAssignments_1.length; _i++) {
+                    var parameter = parametersWithPropertyAssignments_1[_i];
+                    if (ts.isIdentifier(parameter.name)) {
+                        members.push(ts.setOriginalNode(factory.createPropertyDeclaration(
+                        /*modifiers*/ undefined, parameter.name, 
+                        /*questionOrExclamationToken*/ undefined, 
+                        /*type*/ undefined, 
+                        /*initializer*/ undefined), parameter));
+                    }
+                }
+            }
+            ts.addRange(members, ts.visitNodes(node.members, getClassElementVisitor(node), ts.isClassElement));
+            return ts.setTextRange(factory.createNodeArray(members), /*location*/ node.members);
+        }
+        /**
+         * Transforms all of the decorators for a declaration into an array of expressions.
+         *
+         * @param node The declaration node.
+         * @param allDecorators An object containing all of the decorators for the declaration.
+         */
+        function transformAllDecoratorsOfDeclaration(node, container, allDecorators) {
+            var _a, _b, _c, _d;
+            if (!allDecorators) {
+                return undefined;
+            }
+            var decorators = ts.visitArray(allDecorators.decorators, visitor, ts.isDecorator);
+            var parameterDecorators = ts.flatMap(allDecorators.parameters, transformDecoratorsOfParameter);
+            var metadataDecorators = ts.some(decorators) || ts.some(parameterDecorators) ? getTypeMetadata(node, container) : undefined;
+            var result = factory.createNodeArray(ts.concatenate(ts.concatenate(decorators, parameterDecorators), metadataDecorators));
+            var pos = (_b = (_a = ts.firstOrUndefined(allDecorators.decorators)) === null || _a === void 0 ? void 0 : _a.pos) !== null && _b !== void 0 ? _b : -1;
+            var end = (_d = (_c = ts.lastOrUndefined(allDecorators.decorators)) === null || _c === void 0 ? void 0 : _c.end) !== null && _d !== void 0 ? _d : -1;
+            ts.setTextRangePosEnd(result, pos, end);
+            return result;
+        }
+        /**
+         * Transforms the decorators of a parameter into decorators of the class/method.
+         *
+         * @param parameterDecorators The decorators for the parameter at the provided offset.
+         * @param parameterOffset The offset of the parameter.
+         */
+        function transformDecoratorsOfParameter(parameterDecorators, parameterOffset) {
+            if (parameterDecorators) {
+                var decorators = [];
+                for (var _i = 0, parameterDecorators_1 = parameterDecorators; _i < parameterDecorators_1.length; _i++) {
+                    var parameterDecorator = parameterDecorators_1[_i];
+                    var expression = ts.visitNode(parameterDecorator.expression, visitor, ts.isExpression);
+                    var helper = emitHelpers().createParamHelper(expression, parameterOffset);
+                    ts.setTextRange(helper, parameterDecorator.expression);
+                    ts.setEmitFlags(helper, 1536 /* EmitFlags.NoComments */);
+                    var decorator = factory.createDecorator(helper);
+                    ts.setSourceMapRange(decorator, parameterDecorator.expression);
+                    ts.setCommentRange(decorator, parameterDecorator.expression);
+                    ts.setEmitFlags(decorator, 1536 /* EmitFlags.NoComments */);
+                    decorators.push(decorator);
+                }
+                return decorators;
+            }
+        }
+        /**
+         * Gets optional type metadata for a declaration.
+         *
+         * @param node The declaration node.
+         */
+        function getTypeMetadata(node, container) {
+            return USE_NEW_TYPE_METADATA_FORMAT ?
+                getNewTypeMetadata(node, container) :
+                getOldTypeMetadata(node, container);
+        }
+        function getOldTypeMetadata(node, container) {
+            if (typeSerializer) {
+                var decorators = void 0;
+                if (shouldAddTypeMetadata(node)) {
+                    var typeMetadata = emitHelpers().createMetadataHelper("design:type", typeSerializer.serializeTypeOfNode({ currentLexicalScope: currentLexicalScope, currentNameScope: container }, node));
+                    decorators = ts.append(decorators, factory.createDecorator(typeMetadata));
+                }
+                if (shouldAddParamTypesMetadata(node)) {
+                    var paramTypesMetadata = emitHelpers().createMetadataHelper("design:paramtypes", typeSerializer.serializeParameterTypesOfNode({ currentLexicalScope: currentLexicalScope, currentNameScope: container }, node, container));
+                    decorators = ts.append(decorators, factory.createDecorator(paramTypesMetadata));
+                }
+                if (shouldAddReturnTypeMetadata(node)) {
+                    var returnTypeMetadata = emitHelpers().createMetadataHelper("design:returntype", typeSerializer.serializeReturnTypeOfNode({ currentLexicalScope: currentLexicalScope, currentNameScope: container }, node));
+                    decorators = ts.append(decorators, factory.createDecorator(returnTypeMetadata));
+                }
+                return decorators;
+            }
+        }
+        function getNewTypeMetadata(node, container) {
+            if (typeSerializer) {
+                var properties = void 0;
+                if (shouldAddTypeMetadata(node)) {
+                    var typeProperty = factory.createPropertyAssignment("type", factory.createArrowFunction(/*modifiers*/ undefined, /*typeParameters*/ undefined, [], /*type*/ undefined, factory.createToken(38 /* SyntaxKind.EqualsGreaterThanToken */), typeSerializer.serializeTypeOfNode
