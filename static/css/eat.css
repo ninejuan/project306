@@ -1,15 +1,3 @@
-/* body .eat {
-    padding-top: 100px;
-    padding-bottom: 100px;
-    position: relative;
-    min-height: 100vh;
-    display:flex;
-}
-
-div .meals {
-    height: 1000%;
-    display: flexbox;
-} */
 .content {
     display: flex;
     justify-content: center;
@@ -17,20 +5,18 @@ div .meals {
     min-height: 100vh;
 }
 
-table {
-    width: 100%;
-    border-top: 1px solid #444444;
-    border-collapse: collapse;
+body .eat {
+    background-color: rgb(48, 48, 48);
 }
 
-th,
-td {
-    border-bottom: 1px solid #444444;
-    border-left: 1px solid #444444;
-    padding: 10px;
+.eachMeal {
+    background-color: rgb(22, 22, 22);
+    color: rgb(255, 255, 255);
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
 }
 
-th:first-child,
-td:first-child {
-    border-left: none;
+p .mealMenu {
+    font-weight: bolder;
 }
