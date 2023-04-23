@@ -218,7 +218,7 @@
 		{/each}
 	</div>
 </div>
-<!-- <footer class="site-footer">
+<footer class="site-footer" id="sf">
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12 col-md-3">
@@ -289,4 +289,4 @@
 			</div>
 		</div>
 	</div>
-</footer> -->
+</footer>
