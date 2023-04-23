@@ -10,6 +10,7 @@
   left:0;
   right:0;
   font-family: 'jamsil', 'sans-serif';
+  bottom:0;
 }
 
 h6 {
@@ -22,6 +23,7 @@ h6 {
   font-size: 15px;
   line-height: 24px;
   color: #737373;
+  position: fixed;
 }
 
 .site-footer hr {

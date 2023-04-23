@@ -1,0 +1,36 @@
+/* body .eat {
+    padding-top: 100px;
+    padding-bottom: 100px;
+    position: relative;
+    min-height: 100vh;
+    display:flex;
+}
+
+div .meals {
+    height: 1000%;
+    display: flexbox;
+} */
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+table {
+    width: 100%;
+    border-top: 1px solid #444444;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid #444444;
+    border-left: 1px solid #444444;
+    padding: 10px;
+}
+
+th:first-child,
+td:first-child {
+    border-left: none;
+}
