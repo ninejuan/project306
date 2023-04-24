@@ -61,6 +61,8 @@ footer {
 }
 
 @media all and (min-width: 768px) {
+
+}
     
 
 /* IPhone SE2 같이 width 길이가 짧은 기종의 경우 projectDiv의 길이로 인해 footer space 발생 문제 있음 */

@@ -1,4 +1,4 @@
-import config from '../config.js'
+import config from '../../config.js'
 /* import env from "dotenv";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";

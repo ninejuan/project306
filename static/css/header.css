@@ -293,8 +293,8 @@
     display: block;
   }
 @media all and (max-width: 768px) {
-  .mobile-nav-toggle {
-    display: block;
+  #mobile-arrow-btn {
+    visibility: visible !important;
   }
 }
 @media all and (min-width: 769px) {
@@ -302,9 +302,6 @@
     display: none;
   }
 }
-.mobile-nav-toggle {
-  display: none;
-}
-a .title {
-  text-decoration: none !important;
+#mobile-arrow-btn {
+  visibility:hidden;
 }

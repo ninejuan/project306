@@ -3,7 +3,46 @@ import env from 'dotenv'
 import mongo from 'mongoose'
 import setting from '../../config'
 env.config();
-mongo.connect(`${process.env.MONGOSRV}`)
+mongo.connect(`${process.env.MONGOSRV}`);
+
+function getWeekDate() {
+    const x = new Date();
+    const day = x.getDay();
+    if (day == 0 || day == 6) {
+        // 주말인 경우
+        // let calcDate = x.getDate() - day + ((day == 0 ? 1 : 8) + 0);
+        // return calcDate;
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, and so on
+        const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - daysSinceMonday);
+
+        const year = monday.getFullYear();
+        let month; // 0 is January, 1 is February, and so on
+        const date = monday.getDate();
+
+        if (monday.getMonth() < 10) {
+            month = `0${monday.getMonth() + 1}`;
+        } else {
+            month = monday.getMonth() + 1;
+        }
+
+        return `${year}${month}${date}`
+    } else {
+        // 평일인 경우
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, and so on
+        const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const monday = new Date(today);
+        monday.setDate(today.getDate() - daysSinceMonday);
+        if (monday.getMonth() < 10) {
+            return `${monday.getFullYear()}0${monday.getMonth() + 1}${monday.getDate()}`
+        } else {
+            return `${monday.getFullYear()}${monday.getMonth() + 1}${monday.getDate()}`
+        }
+    }
+}
 
 export async function load({ params }) {
     const options = {
@@ -14,8 +53,8 @@ export async function load({ params }) {
             Type: 'json',
             ATPT_OFCDC_SC_CODE: process.env.SCHOOL_REGION,
             SD_SCHUL_CODE: process.env.SCHOOL_CODE,
-            MLSV_FROM_YMD: 20230424,
-            MLSV_TO_YMD: 20230428,
+            pSize: 5,
+            MLSV_FROM_YMD: parseInt(getWeekDate()),
         },
     };
 

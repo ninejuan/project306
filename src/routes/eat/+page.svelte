@@ -18,18 +18,18 @@
 							target="_blank">상태</a
 						>
 					</li>
-					<li><a class="nav-link scrollto" href="/noti">공지</a></li>
-					<li><a class="nav-link scrollto" href="/i/laon">디스코드</a></li>
-					<li><a class="nav-link scrollto" href="/invite">초대하기</a></li>
-					<li><a class="getstarted scrollto" href="/login"><strong>로그인</strong></a></li>
+					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
+					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
+					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
+					<li><a class="getstarted scrollto" href="/notice"><strong>알림장</strong></a></li>
 				</ul>
-				<i class="fas fa-arrow-left mobile-nav-toggle" onclick="history.back()" />
+				<i id="mobile-arrow-btn" class="fas fa-arrow-left mobile-nav-toggle" onclick="history.back()" />
 			</nav>
 		</div>
 	</header>
 	<div class="content" style="padding:150px;">
 		<div class="meals">
-			<h2 class="tWhite">이번 주의 급식 정보입니다.</h2>
+			<h2 class="tWhite mealTitle">이번 주의 급식 정보</h2>
 			{#each meals as meal, i}
 				<div class="eachMeal">
 					<h3>

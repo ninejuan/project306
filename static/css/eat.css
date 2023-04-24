@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap');
+
 .content {
     display: flex;
     justify-content: center;
@@ -19,4 +21,23 @@ body .eat {
 
 p .mealMenu {
     font-weight: bolder;
+    font: 'Jua', sans-serif;
+}
+
+@media all and (max-width: 768px) {
+    .mealTitle {
+        font-size: 25px;
+        font-weight: bolder;
+        margin-bottom: 10px;
+        font: 'Jua', sans-serif;
+    }
+}
+
+@media all and (min-width: 769px) {
+    .mealTitle {
+        font-size: 50px;
+        font-weight: bolder;
+        margin-bottom: 10px;
+        font: 'Jua', sans-serif;
+    }
 }
