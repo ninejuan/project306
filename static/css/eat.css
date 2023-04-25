@@ -11,17 +11,14 @@ body .eat {
     background-color: rgb(48, 48, 48);
 }
 
-.eachMeal {
+.eachMeal, .mealProviderData {
     background-color: rgb(22, 22, 22);
     color: rgb(255, 255, 255);
     padding: 20px;
     margin: 20px;
     border-radius: 10px;
-}
-
-p .mealMenu {
-    font-weight: bolder;
-    font: 'Jua', sans-serif;
+    font-family: 'jamsil', 'sans-serif';
+    font-size:larger;
 }
 
 @media all and (max-width: 768px) {
@@ -29,7 +26,7 @@ p .mealMenu {
         font-size: 25px;
         font-weight: bolder;
         margin-bottom: 10px;
-        font: 'Jua', sans-serif;
+        font-family: 'Jua', sans-serif;
     }
 }
 
@@ -38,6 +35,6 @@ p .mealMenu {
         font-size: 50px;
         font-weight: bolder;
         margin-bottom: 10px;
-        font: 'Jua', sans-serif;
+        font-family: 'Jua', sans-serif;
     }
 }

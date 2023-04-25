@@ -3,23 +3,21 @@ import env from 'dotenv'
 import mongo from 'mongoose'
 import setting from '../../config'
 env.config();
-mongo.connect(`${process.env.MONGOSRV}`);
+// mongo.connect(`${process.env.MONGOSRV}`);
 
 function getWeekDate() {
     const x = new Date();
     const day = x.getDay();
+    console.log(day)
     if (day == 0 || day == 6) {
-        // 주말인 경우
-        // let calcDate = x.getDate() - day + ((day == 0 ? 1 : 8) + 0);
-        // return calcDate;
         const today = new Date();
-        const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, and so on
+        const dayOfWeek = today.getDay();
         const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
         const monday = new Date(today);
         monday.setDate(today.getDate() - daysSinceMonday);
 
         const year = monday.getFullYear();
-        let month; // 0 is January, 1 is February, and so on
+        let month;
         const date = monday.getDate();
 
         if (monday.getMonth() < 10) {
@@ -32,7 +30,7 @@ function getWeekDate() {
     } else {
         // 평일인 경우
         const today = new Date();
-        const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, and so on
+        const dayOfWeek = today.getDay();
         const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
         const monday = new Date(today);
         monday.setDate(today.getDate() - daysSinceMonday);

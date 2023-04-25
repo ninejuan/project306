@@ -48,6 +48,7 @@
   <title>306</title>
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   <script src="js/navbar.js"></script>
+  <script src="js/functions.js"></script>
   <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </svelte:head>
 <slot />

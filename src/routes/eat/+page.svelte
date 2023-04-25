@@ -1,6 +1,13 @@
 <script>
 	export let data;
 	const meals = data.data;
+
+	function convertYMD(date) {
+		let year = `${date}`.slice(0, 4);
+		let month = `${date}`.slice(4, 6);
+		let day = `${date}`.slice(6, 8);
+		return `${year}년 ${month}월 ${day}일`;
+	}
 </script>
 
 <link rel="stylesheet" href="/css/eat.css" />
@@ -23,7 +30,11 @@
 					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
 					<li><a class="getstarted scrollto" href="/notice"><strong>알림장</strong></a></li>
 				</ul>
-				<i id="mobile-arrow-btn" class="fas fa-arrow-left mobile-nav-toggle" onclick="history.back()" />
+				<i
+					id="mobile-arrow-btn"
+					class="fas fa-arrow-left mobile-nav-toggle"
+					onclick="history.back()"
+				/>
 			</nav>
 		</div>
 	</header>
@@ -32,10 +43,10 @@
 			<h2 class="tWhite mealTitle">이번 주의 급식 정보</h2>
 			{#each meals as meal, i}
 				<div class="eachMeal">
-					<h3>
+					<h3 class="mealProviderData">
 						<span class="mealSchoolname">{meal.SCHUL_NM}</span>
-						<br>
-						<span class="mealDate">날짜: {meal.MLSV_YMD}</span>
+						<br />
+						<span class="mealDate">{convertYMD(meal.MLSV_YMD)}</span>
 					</h3>
 					<p class="mealMenu">
 						<strong>{meal.DDISH_NM.replaceAll('<br/>', '\n')}</strong>
@@ -112,3 +123,5 @@
 		</div>
 	</footer>
 </body>
+
+<slot />
