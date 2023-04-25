@@ -1,26 +1,28 @@
-import config from '../config.js'
-/* import env from "dotenv";
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
+import config from '../../config.js'
+import env from 'dotenv'
+import ttable from 'comcigan-parser'
+const tt = new ttable();
 env.config();
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAJ53fI-qsgMJ9HEdnYv6chv7c--BX6x1w",
-    authDomain: "svc-9e818.firebaseapp.com",
-    projectId: "svc-9e818",
-    storageBucket: "svc-9e818.appspot.com",
-    messagingSenderId: "379021395912",
-    appId: "1:379021395912:web:21e7213ee26e1544da22fd",
-    measurementId: "G-604T6K2N18"
-};
+async function getSd() {
+	await tt.init();
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+	const schoolList = await tt.search(process.env.SCHOOL_NAME);
+	const targetSchool = schoolList.find((school) => {
+		return school.region === process.env.SCHOOL_REGION_KR && school.name === process.env.SCHOOL_NAME;
+	});
 
-console.log('123')
-console.log(process.env.APIKEY) */
+	await tt.setSchool(targetSchool.code);
+	const result = await tt.getTimetable();
+	console.log(result[process.env.SCHOOL_GRADE][process.env.SCHOOL_CLASS])
+	return result[process.env.SCHOOL_GRADE][process.env.SCHOOL_CLASS];
+}
 
 export function load({ params }) {
-    return config;
+	let res = getSd();
+	return {
+		res: res
+	};
 }
+
+// replaceAll('조은', '은솔신')

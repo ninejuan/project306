@@ -76,13 +76,18 @@
 					<h6>주안Lab</h6>
 					<ul class="footer-links">
 						<li>
-							<a href="https://306.juany.kr" target="_blank" rel="noopener noreferrer"
-								>아람이 대시보드</a
+							<a href="https://juany.kr" target="_blank" rel="noopener noreferrer"
+								>주안 포트폴리오</a
 							>
 						</li>
 						<li>
 							<a href="https://docs.aramy.net" target="_blank" rel="noopener noreferrer"
-								>아람이 API 문서</a
+								>주안Lab 바로가기</a
+							>
+						</li>
+						<li>
+							<a href="https://github.com/ninejuan" target="_blank" rel="noopener noreferrer"
+								>주안의 인생</a
 							>
 						</li>
 					</ul>

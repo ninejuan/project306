@@ -8,7 +8,6 @@ env.config();
 function getWeekDate() {
     const x = new Date();
     const day = x.getDay();
-    console.log(day)
     if (day == 0 || day == 6) {
         const today = new Date();
         const dayOfWeek = today.getDay();
