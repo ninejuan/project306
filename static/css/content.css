@@ -7,11 +7,11 @@
     min-height: 100vh;
 }
 
-body .eat {
+body .ct {
     background-color: rgb(48, 48, 48);
 }
 
-.eachMeal, .mealProviderData {
+.eachC, .cProviderData {
     background-color: rgb(22, 22, 22);
     color: rgb(255, 255, 255);
     padding: 20px;
@@ -22,7 +22,7 @@ body .eat {
 }
 
 @media all and (max-width: 768px) {
-    .mealTitle {
+    .cTitle {
         font-size: 25px;
         font-weight: bolder;
         margin-bottom: 10px;
@@ -31,7 +31,7 @@ body .eat {
 }
 
 @media all and (min-width: 769px) {
-    .mealTitle {
+    .cTitle {
         font-size: 50px;
         font-weight: bolder;
         margin-bottom: 10px;

@@ -2,7 +2,6 @@
 	import { each } from 'svelte/internal';
 
 	export let data;
-
 	function convertNumToKrDay(param) {
 		let res = `${param}`
 			.replace('1', '월')
@@ -14,7 +13,8 @@
 	}
 </script>
 
-<body>
+<link rel="stylesheet" href="css/content.css" />
+<body class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
 			<h1 class="logo">
@@ -43,13 +43,26 @@
 			</nav>
 		</div>
 	</header>
-	<div class="content" style="padding:150px;">
+	<div class="content" style="padding:150px; display: flex;">
+		{#if data.res == null}
+			<div class="alert alert-danger" role="alert">
+				시간표를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.
+			</div>
+		{/if}
+
 		{#each data.res as dt, index}
-			{convertNumToKrDay(index + 1)}.
-			{#each a as a, index}
-				<!-- 각 날짜 시간표 구하기 -->
-				{JSON.stringify(data.res[index])}<br />
-			{/each}
+			<div class="eachC">
+				{convertNumToKrDay(index + 1)}.<br />
+				{#each data.res[index] as a, i}
+					{JSON.stringify(data.res[index][i].classTime)}교시.
+
+					{JSON.stringify(data.res[index][i].subject).replaceAll('""', '없음').replaceAll('"', '')} -
+					{JSON.stringify(data.res[index][i].teacher)
+						.replaceAll('조은', '은솔신')
+						.replaceAll('""', '없음')
+						.replaceAll('"', '')} <br />
+				{/each}<br />
+			</div>
 		{/each}
 		<!-- {JSON.stringify(data.res[0])} -->
 	</div>

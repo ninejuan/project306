@@ -14,7 +14,6 @@ async function getSd() {
 
 	await tt.setSchool(targetSchool.code);
 	const result = await tt.getTimetable();
-	console.log(result[process.env.SCHOOL_GRADE][process.env.SCHOOL_CLASS])
 	return result[process.env.SCHOOL_GRADE][process.env.SCHOOL_CLASS];
 }
 

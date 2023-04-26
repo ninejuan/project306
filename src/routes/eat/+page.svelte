@@ -10,8 +10,8 @@
 	}
 </script>
 
-<link rel="stylesheet" href="/css/eat.css" />
-<body class="eat">
+<link rel="stylesheet" href="/css/content.css" />
+<body class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
 			<h1 class="logo"><a href="/" class="title" style="text-decoration: none;">306 ㅣ 급식</a></h1>
@@ -40,10 +40,10 @@
 	</header>
 	<div class="content" style="padding:150px;">
 		<div class="meals">
-			<h2 class="tWhite mealTitle">이번 주의 급식 정보</h2>
+			<h2 class="tWhite cTitle">이번 주의 급식 정보</h2>
 			{#each meals as meal, i}
-				<div class="eachMeal">
-					<h3 class="mealProviderData">
+				<div class="eachC">
+					<h3 class="cProviderData">
 						<span class="mealSchoolname">{meal.SCHUL_NM}</span>
 						<br />
 						<span class="mealDate">{convertYMD(meal.MLSV_YMD)}</span>
