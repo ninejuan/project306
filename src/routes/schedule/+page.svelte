@@ -43,24 +43,26 @@
 			</nav>
 		</div>
 	</header>
-	<div class="content" style="padding:150px; display: flex;">
+	<div class="content-inline" style="padding:150px; display: flex;">
 		{#if data.res == null}
 			<div class="alert alert-danger" role="alert">
 				시간표를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.
 			</div>
 		{/if}
-
+		<h2 class="tWhite cTitle">이번주 시간표</h2>
 		{#each data.res as dt, index}
-			<div class="eachC">
-				{convertNumToKrDay(index + 1)}.<br />
+				<div class="eachC">
+					{convertNumToKrDay(index + 1)}.<br />
 				{#each data.res[index] as a, i}
-					{JSON.stringify(data.res[index][i].classTime)}교시.
-
-					{JSON.stringify(data.res[index][i].subject).replaceAll('""', '없음').replaceAll('"', '')} -
-					{JSON.stringify(data.res[index][i].teacher)
-						.replaceAll('조은', '은솔신')
-						.replaceAll('""', '없음')
-						.replaceAll('"', '')} <br />
+					<h3 class="cProviderData">{JSON.stringify(data.res[index][i].classTime)}교시.
+						{JSON.stringify(data.res[index][i].subject)
+							.replaceAll('""', '없음')
+							.replaceAll('"', '')} -
+						{JSON.stringify(data.res[index][i].teacher)
+							.replaceAll('조은', '은솔신')
+							.replaceAll('""', '없음')
+							.replaceAll('"', '')} <br />
+						</h3>
 				{/each}<br />
 			</div>
 		{/each}

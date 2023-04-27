@@ -18,6 +18,7 @@ async function getSd() {
 }
 
 export function load({ params }) {
+	process.stdout.write('\u0007');
 	let res = getSd();
 	return {
 		res: res

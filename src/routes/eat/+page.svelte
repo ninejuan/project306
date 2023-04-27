@@ -38,7 +38,7 @@
 			</nav>
 		</div>
 	</header>
-	<div class="content" style="padding:150px;">
+	<div class="content-flex" style="padding:150px;">
 		<div class="meals">
 			<h2 class="tWhite cTitle">이번 주의 급식 정보</h2>
 			{#each meals as meal, i}

@@ -1,10 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap');
 
-.content {
+.content-flex:not(.cTitle) {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    flex-direction:column;
+}
+
+.content-inline:not(.cTitle) {
+    display:contents;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction:column;
+}
+
+.ScdMenu, .cProviderData {
+    display:inherit
 }
 
 body .ct {
@@ -21,12 +34,17 @@ body .ct {
     font-size:larger;
 }
 
+.eachC {
+    width: 80vw;
+}
+
 @media all and (max-width: 768px) {
     .cTitle {
         font-size: 25px;
         font-weight: bolder;
         margin-bottom: 10px;
         font-family: 'Jua', sans-serif;
+        flex-direction: row;
     }
 }
 
@@ -36,5 +54,11 @@ body .ct {
         font-weight: bolder;
         margin-bottom: 10px;
         font-family: 'Jua', sans-serif;
+        flex-direction: row;
     }
+}
+
+h2 {
+    align-items: center;
+    flex-direction: row;
 }
