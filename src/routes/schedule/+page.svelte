@@ -26,8 +26,8 @@
 					<li>
 						<a
 							class="nav-link scrollto"
-							href="https://status.laon.dev/status/team-laon"
-							target="_blank">상태</a
+							href="/notice"
+							target="_blank">공지</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
@@ -51,8 +51,8 @@
 		{/if}
 		<h2 class="tWhite cTitle">이번주 시간표</h2>
 		{#each data.res as dt, index}
-				<div class="eachC">
-					{convertNumToKrDay(index + 1)}.<br />
+				<div class="eachC schedule">
+					<span class="scDayNo">{convertNumToKrDay(index + 1)}요일.</span><br />
 				{#each data.res[index] as a, i}
 					<h3 class="cProviderData">{JSON.stringify(data.res[index][i].classTime)}교시.
 						{JSON.stringify(data.res[index][i].subject)

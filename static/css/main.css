@@ -46,6 +46,10 @@ footer {
     display: contents;
 }
 
+.schedule {
+    text-align: center;
+}
+
 /* Tablet */
 @media all and (min-width: 768px) and (max-width: 1024px) {
     .copyright {

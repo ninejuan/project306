@@ -21,8 +21,8 @@
 					<li>
 						<a
 							class="nav-link scrollto"
-							href="https://status.laon.dev/status/team-laon"
-							target="_blank">상태</a
+							href="/notice"
+							target="_blank">공지</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>

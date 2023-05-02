@@ -1,4 +1,4 @@
-import config from '../../config.js'
+import config from '../config.js'
 import env from 'dotenv'
 import ttable from 'comcigan-parser'
 const tt = new ttable();
