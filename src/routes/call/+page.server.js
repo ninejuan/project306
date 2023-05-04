@@ -1,4 +1,3 @@
-import config from '../config.js'
 /* import env from "dotenv";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -22,5 +21,5 @@ console.log('123')
 console.log(process.env.APIKEY) */
 
 export function load({ params }) {
-    return config;
+    return {};
 }

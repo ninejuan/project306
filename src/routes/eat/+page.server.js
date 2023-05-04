@@ -1,9 +1,7 @@
 import req from 'request'
 import env from 'dotenv'
-import mongo from 'mongoose'
 import setting from '../config.js'
 env.config();
-// mongo.connect(`${process.env.MONGOSRV}`);
 
 function getWeekDate() {
     const x = new Date();

@@ -1,5 +1,6 @@
 <script>
 	export let data;
+	console.log(, 'ddede')
 </script>
 
 <body>

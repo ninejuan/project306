@@ -1,26 +1,42 @@
-import config from '../config.js'
-/* import env from "dotenv";
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
+import env from 'dotenv'
+import mongo from 'mongoose'
+import notiSchema from '../../models/noti.js'
 env.config();
+mongo.connect(`${process.env.MONGOSRV}`)
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAJ53fI-qsgMJ9HEdnYv6chv7c--BX6x1w",
-    authDomain: "svc-9e818.firebaseapp.com",
-    projectId: "svc-9e818",
-    storageBucket: "svc-9e818.appspot.com",
-    messagingSenderId: "379021395912",
-    appId: "1:379021395912:web:21e7213ee26e1544da22fd",
-    measurementId: "G-604T6K2N18"
-};
+// const notices = mongo.model(
+//     "notices",
+//     new mongo.Schema({
+//         when: {
+//             year: { type: Number, required: true },
+//             month: { type: Number, required: true },
+//             date: { type: Number, required: true },
+//             hour: { type: Number, required: true },
+//             minute: { type: Number, required: true }
+//         },
+//         Writer: { type: String, required: true },
+//         Title: { type: String, required: true },
+//         Content: { type: String, required: true }
+//     })
+// )
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-console.log('123')
-console.log(process.env.APIKEY) */
+// Noti view page
 
 export function load({ params }) {
-    return config;
+    // new notiSchema({
+    //     when: {
+    //         year: 2023,
+    //         month: 4,
+    //         date: 20,
+    //         hour: 11,
+    //         minute: 59
+    //     },
+    //     Writer: "이주안",
+    //     Title: "tlgjadl sjan djfjd",
+    //     Content: "tlgjadl sjan djfjd"
+    // }).save().then(() => console.log('success'));
+    delete mongo.connection.models['notices'];
+    return {
+        data: notiSchema.find() ?? []
+    };
 }
