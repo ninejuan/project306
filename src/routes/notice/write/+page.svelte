@@ -47,18 +47,13 @@
 	  
 		  </div>
 	</header>
-	<footer class="site-footer">
+	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">
 				<div class="col-sm-12 col-md-3">
 					<h6 style="font-family: 'Jua', sans-serif;">정보</h6>
 					<p class="text-justify" style="color: gray;">
-						초보 화이트해커 주안입니다. 화이트햇 팀 <a
-							href="https://secstf.kr"
-							target="_blank"
-							rel="noopener noreferrer"
-							style="color:white;text-decoration:none;">SnatchTheFlag</a
-						>에서 활동하고 있습니다.
+						길음중학교 3학년 6반 학생들을 위한 종합 플랫폼입니다.
 					</p>
 				</div>
 
@@ -73,13 +68,18 @@
 					<h6>주안Lab</h6>
 					<ul class="footer-links">
 						<li>
-							<a href="https://306.juany.kr" target="_blank" rel="noopener noreferrer"
-								>아람이 대시보드</a
+							<a href="https://juany.kr" target="_blank" rel="noopener noreferrer"
+								>주안 포트폴리오</a
 							>
 						</li>
 						<li>
 							<a href="https://docs.aramy.net" target="_blank" rel="noopener noreferrer"
-								>아람이 API 문서</a
+								>주안Lab 바로가기</a
+							>
+						</li>
+						<li>
+							<a href="https://github.com/ninejuan" target="_blank" rel="noopener noreferrer"
+								>주안의 인생</a
 							>
 						</li>
 					</ul>
@@ -88,16 +88,14 @@
 				<div class="col-xs-6 col-md-3">
 					<h6>Contact</h6>
 					<ul class="footer-links">
-						<li><a href="mailto:{data.contact.mail}">Mail</a></li>
+						<li><a href="mailto:me@juany.kr">Mail</a></li>
 						<li>
-							<a
-								href="https://github.com/{data.contact.github}"
-								target="_blank"
-								rel="noopener noreferrer">Github</a
+							<a href="https://github.com/ninejuan" target="_blank" rel="noopener noreferrer"
+								>Github</a
 							>
 						</li>
 						<li>
-							<a href="https://discord.com/users/{data.contact.discord}" rel="noopener noreferrer"
+							<a href="https://discord.com/users/927049010072682516" rel="noopener noreferrer"
 								>Discord</a
 							>
 						</li>

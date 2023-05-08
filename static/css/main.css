@@ -50,6 +50,19 @@ footer {
     text-align: center;
 }
 
+.seperatedNoti {
+    background-color: rgb(0, 0, 0);
+    cursor: pointer;
+    width: 80vw;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.seperatedNoti:hover {
+    background-color: gray;
+}
+
 /* Tablet */
 @media all and (min-width: 768px) and (max-width: 1024px) {
     .copyright {
@@ -64,17 +77,11 @@ footer {
     }
 }
 
-@media all and (min-width: 768px) {
+@media all and (min-width: 768px) {}
 
-}
-    
 
 /* IPhone SE2 같이 width 길이가 짧은 기종의 경우 projectDiv의 길이로 인해 footer space 발생 문제 있음 */
-@media all and (max-width: 410px) {
-    
-}
+@media all and (max-width: 410px) {}
 
 /* 화면의 height 값이 790px 이상일 경우 메인 content 가리는 문제 발생 */
-@media all and (min-width: 411px) {
-    
-}
+@media all and (min-width: 411px) {}
