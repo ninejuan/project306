@@ -28,7 +28,6 @@
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
 					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
 					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
-					<li><a class="getstarted scrollto" href="/notice"><strong>알림장</strong></a></li>
 				</ul>
 				<i
 					id="mobile-arrow-btn"
@@ -55,6 +54,7 @@
 			{/each}
 		</div>
 	</div>
+	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;"/>
 	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">

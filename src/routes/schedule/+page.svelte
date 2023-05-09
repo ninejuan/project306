@@ -43,7 +43,7 @@
 			</nav>
 		</div>
 	</header>
-	<div class="content-inline" style="padding:150px; display: flex;">
+	<div class="content-flex scContent" style="padding:150px;">
 		{#if data.res == null}
 			<div class="alert alert-danger" role="alert">
 				시간표를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.
@@ -68,6 +68,7 @@
 		{/each}
 		<!-- {JSON.stringify(data.res[0])} -->
 	</div>
+	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;"/>
 	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">

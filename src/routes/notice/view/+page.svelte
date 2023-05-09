@@ -47,6 +47,7 @@
 	  
 		  </div>
 	</header>
+	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;"/>
 	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">

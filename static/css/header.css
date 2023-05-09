@@ -62,7 +62,7 @@
   # Header
   --------------------------------------------------------------*/
   #header {
-    background: #191919;
+    background: #111827;
     transition: all 0.5s;
     z-index: 997;
     padding: 20px 0;
@@ -128,7 +128,7 @@
     margin-left: 5px;
   }
   .navbar a:hover, .navbar .active, .navbar .active:focus, .navbar li:hover > a {
-    color: rgb(255, 172, 186);
+    color: white;
   }
   .navbar .getstarted, .navbar .getstarted:focus {
     padding: 10px 25px;

@@ -20,12 +20,15 @@
     display:inherit
 }
 
+.scContent {
+    width: auto;
+}
+
 body .ct {
-    background-color: rgb(48, 48, 48);
+    background-color: #111827;
 }
 
 .eachC, .cProviderData {
-    background-color: rgb(22, 22, 22);
     color: rgb(255, 255, 255);
     padding: 20px;
     margin: 20px;
@@ -36,11 +39,14 @@ body .ct {
 
 .eachC {
     width: 80vw;
+    border-color: white;
+    border-radius: 5px;
+    border: 1px solid white;
 }
 
 @media all and (max-width: 768px) {
     .cTitle {
-        font-size: 25px;
+        font-size: 30px;
         font-weight: bolder;
         margin-bottom: 10px;
         font-family: 'Jua', sans-serif;

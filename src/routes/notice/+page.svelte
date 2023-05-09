@@ -3,129 +3,81 @@
 	console.log(data);
 </script>
 
-<body>
+<body class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
-			<h1 class="logo"><a href="/" class="noULine">306</a></h1>
+			<h1 class="logo">
+				<a href="/" class="title" style="text-decoration: none;">306 ㅣ 알림장</a>
+			</h1>
 
 			<nav id="navbar" class="navbar">
 				<ul>
 					<li>
-						<a class="nav-link scrollto" href="/notice" target="_blank"
-							><svg
-								stroke="currentColor"
-								fill="none"
-								stroke-width="0"
-								viewBox="0 0 24 24"
-								aria-hidden="true"
-								focusable="false"
-								height="1em"
-								width="1em"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"
-								/>
-							</svg>&nbsp;공지</a
-						>
+						<a class="nav-link scrollto" href="/notice" target="_blank">공지</a>
 					</li>
-					<li>
-						<a class="nav-link scrollto" href="/noti"
-							><svg
-								stroke="currentColor"
-								fill="currentColor"
-								stroke-width="0"
-								viewBox="0 0 20 20"
-								aria-hidden="true"
-								focusable="false"
-								height="1em"
-								width="1em"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									fill-rule="evenodd"
-									d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
-									clip-rule="evenodd"
-								/>
-							</svg>&nbsp;공지</a
-						>
-					</li>
-					<li class="dropdown">
-						<a href="#"><span>바로가기</span> <i class="bi bi-chevron-down" /></a>
-						<ul>
-							<li><a href="https://github.com/Team-Laon" target="_blank">팀 공식 깃허브</a></li>
-							<li>
-								<a
-									href="mailto:juan@laon.dev"
-									onclick="alert('만약 메일 앱이 열리지 않으면 juan@laon.dev으로 문의주세요. 메일은 이 알림이 닫히고 열릴거에요')"
-									>메일로 문의하기</a
-								>
-							</li>
-							<li class="dropdown">
-								<a href="#"><span>More</span> <i class="bi bi-chevron-right" /></a>
-								<ul>
-									<li><a href="https://laon.dev">팀 공식 홈페이지</a></li>
-									<li><a href="https://api.aramy.net" target="_blank">아람이 API</a></li>
-									<li><a href="https://docs.aramy.net" target="_blank">API Docs</a></li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-					<li>
-						<a class="nav-link scrollto" href="/i/laon" target="_blank">
-							<svg
-								stroke="currentColor"
-								fill="currentColor"
-								stroke-width="0"
-								viewBox="0 0 640 512"
-								font-size="1.2em"
-								aria-hidden="true"
-								focusable="false"
-								height="1em"
-								width="1em"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.541,309.541,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.137a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.426,6.027,4.851,9.132,7.16a1.884,1.884,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.729,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z"
-								/>
-							</svg>&nbsp;디스코드</a
-						>
-					</li>
-					<li><a class="nav-link scrollto" href="#" /></li>
-					<li>
-						<a
-							class="getstarted scrollto"
-							href="https://discord.com/api/oauth2/authorize?client_id=<%= bot.user.id %>&permissions=8&scope=bot%20applications.commands"
-							target="_blank"><strong>초대하기</strong></a
-						>
-					</li>
+					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
+					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
+					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
+					<li><a class="getstarted scrollto" href="/notice"><strong>알림장</strong></a></li>
 				</ul>
-				<i class="bi bi-list mobile-nav-toggle" />
+				<i
+					id="mobile-arrow-btn"
+					class="fas fa-arrow-left mobile-nav-toggle"
+					onclick="history.back()"
+				/>
 			</nav>
 		</div>
 	</header>
-	<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br
-	/><br />
-	<!-- <p>{JSON.stringify(data.data[0])}</p> -->
-	{#each data.data as d, i}
-		<a href="/notice/view?id={JSON.parse(JSON.stringify(d)).DocumentNum}">
-			<div class="seperatedNoti">
-				<p>{JSON.stringify(d)}</p>
-				<p>
-					{JSON.parse(JSON.stringify(d)).Writer}
-					-
-					{JSON.parse(JSON.stringify(d)).Title}
-				</p>
-				<p>
-					{JSON.parse(JSON.stringify(d)).Content.substr(0, 20) + '...'}
-				</p>
-				<input type="hidden" name="docno" value={JSON.parse(JSON.stringify(d)).DocumentNum} />
+	<link rel="stylesheet" href="css/noti.css" />
+	<link rel="stylesheet" href="css/content.css">
+	<br /><br />
+	<section class="notice">
+		<div class="page-title">
+			<div class="container">
+				<h3>알림장</h3>
 			</div>
-		</a><br /><br />
-	{/each}
+		</div>
+
+		<div id="board-manage">
+			<div class="container">
+					<button type="button" class="btn-primary btn notiWriteBtn" onclick="location.href = '/notice/write'">
+						작성
+					</button>
+			</div>
+		</div>
+
+		<div id="board-list">
+			<div class="container">
+				<table class="board-table" style="word-break:break-all; table-layout:auto;">
+					<thead>
+						<tr>
+							<th scope="col" class="th-num">번호</th>
+							<th scope="col" class="th-title">제목</th>
+							<th scope="col" class="th-date">등록일</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each data.data as d, i}
+							<tr>
+								<td>{i + 1}</td>
+								<th>
+									<a href="/notice/view?id={JSON.parse(JSON.stringify(d)).DocumentNum}">
+										{JSON.parse(JSON.stringify(d)).Title.substr(0, 17)}...
+									</a>
+									<p />
+								</th>
+								<td
+									>{JSON.parse(JSON.stringify(d)).when.year}.{JSON.parse(JSON.stringify(d)).when
+										.month}.{JSON.parse(JSON.stringify(d)).when.date}</td
+								>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;"/>
 	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">

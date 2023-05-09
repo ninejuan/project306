@@ -1,0 +1,11 @@
+@media all and (max-width: 768px) {
+    .th-num {
+        width: 10% !important;
+    }
+    .th-date {
+        width: 20% !important;
+    }
+}
+#body-noti {
+    background-color: #111827;
+}
