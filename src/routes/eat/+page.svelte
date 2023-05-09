@@ -49,7 +49,7 @@
 						<span class="mealDate">{convertYMD(meal.MLSV_YMD)}</span>
 					</h3>
 					<p class="mealMenu">
-						<strong>{meal.DDISH_NM.replaceAll('<br/>', '\n')}</strong>
+						<strong>{@html meal.DDISH_NM}</strong>
 					</p>
 				</div>
 			{/each}
