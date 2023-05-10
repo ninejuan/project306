@@ -22,7 +22,7 @@
 						<a
 							class="nav-link scrollto"
 							href="/notice"
-							target="_blank">공지</a
+							target="_blank">알림장</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
@@ -37,7 +37,7 @@
 			</nav>
 		</div>
 	</header>
-	<div class="content-flex" style="padding:150px;">
+	<div class="content-flex scContent" style="padding:150px;">
 		<div class="meals">
 			<h2 class="tWhite cTitle">이번 주의 급식 정보</h2>
 			{#each meals as meal, i}

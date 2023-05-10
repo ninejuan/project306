@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: 'jamsil';
-  src: url('fonts/LotteJamsilChe.ttf') format('truetype');
+  src: url('/fonts/LotteJamsilChe.ttf') format('truetype');
 }
 
 /* 만일 footer가 하단에 제대로 고정되지 않을 경우 id="sf" 값 줘서 해결 */

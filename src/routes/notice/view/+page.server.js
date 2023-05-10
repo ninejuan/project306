@@ -1,25 +1,28 @@
-/* import env from "dotenv";
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
+import env from 'dotenv'
+import mongo from 'mongoose'
+import notiSchema from '../../../models/noti.js'
 env.config();
+mongo.connect(`${process.env.MONGOSRV}`)
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAJ53fI-qsgMJ9HEdnYv6chv7c--BX6x1w",
-    authDomain: "svc-9e818.firebaseapp.com",
-    projectId: "svc-9e818",
-    storageBucket: "svc-9e818.appspot.com",
-    messagingSenderId: "379021395912",
-    appId: "1:379021395912:web:21e7213ee26e1544da22fd",
-    measurementId: "G-604T6K2N18"
-};
+export async function load({ url }) {
+    delete mongo.connection.models['notices'];
+    let docno = url.searchParams.get('id');
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+    try {
+        let data = await notiSchema.findOne({
+            DocumentNum: docno
+        });
 
-console.log('123')
-console.log(process.env.APIKEY) */
-
-export function load({ params }) {
-    return {};
+        if (data) {
+            return {
+                ...data.toObject(),
+                _id: data._id.toString()
+            };
+        } else {
+            throw new Error('No data found');
+        }
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }

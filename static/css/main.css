@@ -105,9 +105,10 @@ table {
   }
   .page-title h3 {
     font-size: 28px;
-    color: #333333;
+    color: #fff;
     font-weight: 400;
     text-align: center;
+    font-family: 'jamsil', 'sans-serif';
   }
   
   #board-manage .search-window {
@@ -148,17 +149,20 @@ table {
     width: 100%;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
+    color: white;
   }
   
   .board-table a {
-    color: #333;
+    color: #fff;
     display: inline-block;
     line-height: 1.4;
     word-break: break-all;
     vertical-align: middle;
+    text-decoration: none;
   }
   .board-table a:hover {
     text-decoration: underline;
+    color: lime;  
   }
   .board-table th {
     text-align: center;
@@ -272,4 +276,8 @@ table {
 
 .notiWriteBtn {
     float: right;
+}
+
+.notiViewer {
+  font-family: 'jamsil', 'sans-serif';
 }

@@ -27,13 +27,13 @@
 						<a
 							class="nav-link scrollto"
 							href="/notice"
-							target="_blank">공지</a
+							target="_blank">알림장</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
 					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
 					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
-					<li><a class="getstarted scrollto" href="/notice"><strong>알림장</strong></a></li>
+		
 				</ul>
 				<i
 					id="mobile-arrow-btn"

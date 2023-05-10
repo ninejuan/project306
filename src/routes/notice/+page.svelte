@@ -1,6 +1,5 @@
 <script>
 	export let data;
-	console.log(data);
 </script>
 
 <body class="ct">
@@ -13,12 +12,11 @@
 			<nav id="navbar" class="navbar">
 				<ul>
 					<li>
-						<a class="nav-link scrollto" href="/notice" target="_blank">공지</a>
+						<a class="nav-link scrollto" href="/notice" target="_blank">알림장</a>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
 					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
 					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
-					<li><a class="getstarted scrollto" href="/notice"><strong>알림장</strong></a></li>
 				</ul>
 				<i
 					id="mobile-arrow-btn"
@@ -29,23 +27,26 @@
 		</div>
 	</header>
 	<link rel="stylesheet" href="css/noti.css" />
-	<link rel="stylesheet" href="css/content.css">
+	<link rel="stylesheet" href="css/content.css" />
 	<br /><br />
 	<section class="notice">
 		<div class="page-title">
 			<div class="container">
-				<h3>알림장</h3>
+				<h3 class="tWhite">알림장</h3>
 			</div>
 		</div>
 
 		<div id="board-manage">
 			<div class="container">
-					<button type="button" class="btn-primary btn notiWriteBtn" onclick="location.href = '/notice/write'">
-						작성
-					</button>
+				<button
+					type="button"
+					class="btn-primary btn notiWriteBtn"
+					onclick="location.href = '/notice/write'"
+				>
+					작성
+				</button>
 			</div>
 		</div>
-
 		<div id="board-list">
 			<div class="container">
 				<table class="board-table" style="word-break:break-all; table-layout:auto;">
@@ -57,27 +58,31 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each data.data as d, i}
-							<tr>
-								<td>{i + 1}</td>
-								<th>
-									<a href="/notice/view?id={JSON.parse(JSON.stringify(d)).DocumentNum}">
-										{JSON.parse(JSON.stringify(d)).Title.substr(0, 17)}...
-									</a>
-									<p />
-								</th>
-								<td
-									>{JSON.parse(JSON.stringify(d)).when.year}.{JSON.parse(JSON.stringify(d)).when
-										.month}.{JSON.parse(JSON.stringify(d)).when.date}</td
-								>
-							</tr>
-						{/each}
+						{#if data.data}
+							{#each data.data as d, i}
+								<tr>
+									<td>{i + 1}</td>
+									<th>
+										<a href="/notice/view?id={JSON.parse(JSON.stringify(d)).DocumentNum}">
+											{JSON.parse(JSON.stringify(d)).Title.substr(0, 17)}...
+										</a>
+										<p />
+									</th>
+									<td
+										>{JSON.parse(JSON.stringify(d)).when.year}.{JSON.parse(JSON.stringify(d)).when
+											.month}.{JSON.parse(JSON.stringify(d)).when.date}</td
+									>
+								</tr>
+							{/each}
+						{:else}
+							<p>알림장 데이터가 없습니다.</p>
+						{/if}
 					</tbody>
 				</table>
 			</div>
 		</div>
 	</section>
-	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;"/>
+	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">
