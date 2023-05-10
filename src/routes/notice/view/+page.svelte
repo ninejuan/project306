@@ -44,13 +44,6 @@
 			{JSON.parse(JSON.stringify(data)).when.minute}분
 		</p>
 		<p>{JSON.parse(JSON.stringify(data)).Content}</p>
-		<p>
-			{JSON.parse(JSON.stringify(data)).when.year}년
-			{JSON.parse(JSON.stringify(data)).when.month}월
-			{JSON.parse(JSON.stringify(data)).when.date}일,
-			{JSON.parse(JSON.stringify(data)).when.hour}시
-			{JSON.parse(JSON.stringify(data)).when.minute}분
-		</p>
 	</div>
 	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">
