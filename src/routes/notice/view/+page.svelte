@@ -29,8 +29,7 @@
 	<link rel="stylesheet" href="/css/content.css" />
 	<br /><br /><br /><br /><br />
 	<div class="notiContent tWhite tBold notiViewer">
-		<h3>{JSON.parse(JSON.stringify(data)).Title}</h3>
-		<hr style="width: 10vw; height: 3px; background-color: #fff;">
+		<h3><strong>{JSON.parse(JSON.stringify(data)).Title}</strong></h3>
 		<p class="">
 			<span class="tLime">
 				{JSON.parse(JSON.stringify(data)).Writer}
@@ -43,7 +42,8 @@
 			{JSON.parse(JSON.stringify(data)).when.hour}시
 			{JSON.parse(JSON.stringify(data)).when.minute}분
 		</p>
-		<p>{JSON.parse(JSON.stringify(data)).Content}</p>
+		<hr style="width: 10vw; height: 3px; background-color: #fff;">
+		<p>{@html JSON.parse(JSON.stringify(data)).Content}</p>
 	</div>
 	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">

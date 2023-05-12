@@ -1,5 +1,11 @@
 import mongo from 'mongoose'
 
+/**
+ * when array는 작성일 시간 감지해서 자동입력
+ * DocumentNum Data는 연월일(8자리)자동생성 4자리 Int64값으로 저장.
+ * DocumentNum은 gen 후 중복 방지를 위해 미리 데이터 존재여부 결정.
+ */
+
 const notiSchema = new mongo.Schema({
     when: {
         year: { type: Number, required: true },
@@ -12,10 +18,6 @@ const notiSchema = new mongo.Schema({
     Title: { type: String, required: true },
     Content: { type: String, required: true },
     DocumentNum: { type: Number, required: true }
-})
-
-notiSchema.pre('save', () => {
-    console.log('find mongo schema')
 })
 
 const notices = mongo.model(

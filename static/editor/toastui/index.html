@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ToastUI Editor</title>
+
+		<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+		<link
+			rel="stylesheet"
+			href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.css"
+		/>
+
+		<style>
+			@import url('https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.3.6/variable/pretendardvariable-dynamic-subset.css');
+
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				font-family: 'Pretendard Variable', sans-serif;
+				background: rgb(17, 24, 39);
+			}
+
+			#error,
+			#loading {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				width: 100vw;
+			}
+			#error p,
+			#loading p {
+				font-size: 15px;
+				font-weight: 600;
+				color: rgb(243, 244, 246);
+			}
+			#error span,
+			#loading span {
+				font-size: 13px;
+				color: rgb(156, 163, 175);
+			}
+			#error img,
+			#loading img {
+				width: 40px;
+			}
+
+			#loading img {
+				animation: loading 1s linear infinite;
+				transform-origin: center center;
+			}
+			@keyframes loading {
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="loading">
+			<img src="/assets/loading.png" alt="Loading Spinner" />
+			<p>에디터 로딩 중</p>
+			<span>잠시만 기다려 주세요.</span>
+		</div>
+
+		<div id="editor"></div>
+
+		<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+		<script>
+			let editorLoaded = false;
+
+			document.addEventListener('DOMContentLoaded', () => {
+				if (parent == self) {
+					document.querySelector('#editor').remove();
+					document.querySelector('#loading').id = 'error';
+
+					document.querySelector('#error img').src = '/images/warning.svg';
+					document.querySelector('#error p').textContent = '에디터를 로딩할 수 없는 환경입니다.';
+					document.querySelector('#error span').innerHTML =
+						'오류가 지속될 경우 관리자에게 문의해 주세요.';
+
+					loadEditor = () => {};
+				} else {
+					setTimeout(() => {
+						if (!editorLoaded) {
+							document.querySelector('#editor').remove();
+							document.querySelector('#loading').id = 'error';
+
+							document.querySelector('#error img').src = '/images/warning.svg';
+							document.querySelector('#error p').innerHTML = '네트워크 연결이 원활하지 않습니다.';
+							document.querySelector('#error span').innerHTML =
+								'오류가 지속될 경우 관리자에게 문의해 주세요.';
+
+							loadEditor = () => {};
+						}
+					}, 10000);
+				}
+			});
+
+			function loadEditor(content) {
+				document.querySelector('#loading').remove();
+
+				window.tuiEditor = new toastui.Editor({
+					el: document.querySelector('#editor'),
+					height: 'calc(100vh - 5px)',
+					width: '100vw',
+					theme: 'dark',
+					initialValue: content || '',
+					initialEditType: 'wysiwyg',
+					placeholder: '내용을 입력해 주세요.'
+				});
+
+				editorLoaded = true;
+			}
+		</script>
+	</body>
+</html>

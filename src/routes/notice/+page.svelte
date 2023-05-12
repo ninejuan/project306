@@ -26,8 +26,8 @@
 			</nav>
 		</div>
 	</header>
-	<link rel="stylesheet" href="css/noti.css" />
-	<link rel="stylesheet" href="css/content.css" />
+	<link rel="stylesheet" href="/css/noti.css" />
+	<link rel="stylesheet" href="/css/content.css" />
 	<br /><br />
 	<section class="notice">
 		<div class="page-title">
@@ -96,7 +96,7 @@
 				<div class="col-sm-12 col-md-3">
 					<h6 style="font-family: 'Jua', sans-serif;">개발</h6>
 					<a>
-						<img alt="Designed by JuanLee" src="assets/profile.png" width="150" height="150" />
+						<img alt="Designed by JuanLee" src="/assets/profile.png" width="150" height="150" />
 					</a>
 				</div>
 
