@@ -1,21 +1,20 @@
 <script>
+    /** @type {import('./$types').PageData} */
 	export let data;
-	let editor;
-	function submit(event) {
-		document.querySelector('#content').value = editor.contentWindow.tuiEditor.getHTML();
+    
+    let editor;
 
-		if (
-			confirm(
-				'정말로 게시글을 등록하시겠습니까?\n\n※ 확인 버튼을 클릭하면 즉시 알림장 데이터베이스에 저장됩니다.'
-			)
-		) {
-			event.target.submit();
-		}
-	}
+    function submit(event) {
+        document.querySelector('#content').value = editor.contentWindow.tuiEditor.getHTML();
 
-	function loadEditor() {
-		editor.contentWindow.loadEditor();
-	}
+        if (confirm('정말로 게시글을 수정하시겠습니까?\n\n※ 확인 버튼을 클릭하면 즉시 채용 포털에 반영됩니다.')) {
+            event.target.submit();
+        }
+    }
+
+    function loadEditor() {
+        editor.contentWindow.loadEditor(data.content);
+    }
 </script>
 
 <body class="ct">
@@ -47,10 +46,11 @@
 	<div class="notiEditor tBold">
 		<div class="page-title">
 			<div class="container">
-				<h3 class="tWhite">알림장 작성하기</h3>
+				<h3 class="tWhite">알림장 수정하기</h3>
 			</div>
 		</div>
-		<form action="/notice/write" method="POST" on:submit|preventDefault={submit}>
+		<form action="/notice/edit" method="POST" on:submit|preventDefault={submit}>
+			<input type="hidden" name="id" value="{data.docno}" />
 			<div class="form-group">
 				<div class="formTitle">
 					<label for="Title" class="tWhite formDes">
@@ -62,6 +62,7 @@
 						name="Title"
 						class="form-control"
 						maxlength="30"
+						value="{data.title}"
 						required
 					/>
 					<br />
@@ -74,6 +75,7 @@
 						name="writer"
 						class="form-control"
 						maxlength="5"
+						value="{data.writer}"
 						required
 					/><br />
 					<label for="secretkey" class="tWhite formDes">
@@ -93,7 +95,12 @@
 					<label for="content" class="tWhite formDes">
 						내용<span class="tRed">*</span>
 					</label>
-					<input type="hidden" id="content" name="content" required /><br />
+					<input 
+					type="hidden" 
+					id="content" 
+					name="content" 
+					value="{data.content}"
+					required /><br />
 					<p class="tMiddle parentnIF">
 						<iframe
 							src="/editor/toastui/index.html"
@@ -105,7 +112,7 @@
 					</p>
 				</div>
 				<br /><br />
-				<button type="submit" class="submitBtn btn btn-primary btn-lg">확인</button>
+				<button type="submit" class="submitBtn btn btn-primary btn-lg">수정</button>
 			</div>
 		</form>
 	</div>

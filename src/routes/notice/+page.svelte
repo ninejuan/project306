@@ -29,59 +29,61 @@
 	<link rel="stylesheet" href="/css/noti.css" />
 	<link rel="stylesheet" href="/css/content.css" />
 	<br /><br />
-	<section class="notice">
-		<div class="page-title">
-			<div class="container">
-				<h3 class="tWhite">알림장</h3>
+	<div class="minh">
+		<section class="notice">
+			<div class="page-title">
+				<div class="container">
+					<h3 class="tWhite">6반의 알림장</h3>
+				</div>
 			</div>
-		</div>
 
-		<div id="board-manage">
-			<div class="container">
-				<button
-					type="button"
-					class="btn-primary btn notiWriteBtn"
-					onclick="location.href = '/notice/write'"
-				>
-					작성
-				</button>
+			<div id="board-manage">
+				<div class="container">
+					<button
+						type="button"
+						class="btn-primary btn notiWriteBtn"
+						onclick="location.href = '/notice/write'"
+					>
+						작성
+					</button>
+				</div>
 			</div>
-		</div>
-		<div id="board-list">
-			<div class="container">
-				<table class="board-table" style="word-break:break-all; table-layout:auto;">
-					<thead>
-						<tr>
-							<th scope="col" class="th-num">번호</th>
-							<th scope="col" class="th-title">제목</th>
-							<th scope="col" class="th-date">등록일</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#if data.data}
-							{#each data.data as d, i}
-								<tr>
-									<td>{i + 1}</td>
-									<th>
-										<a href="/notice/view?id={JSON.parse(JSON.stringify(d)).DocumentNum}">
-											{JSON.parse(JSON.stringify(d)).Title.substr(0, 17)}...
-										</a>
-										<p />
-									</th>
-									<td
-										>{JSON.parse(JSON.stringify(d)).when.year}.{JSON.parse(JSON.stringify(d)).when
-											.month}.{JSON.parse(JSON.stringify(d)).when.date}</td
-									>
-								</tr>
-							{/each}
-						{:else}
-							<p>알림장 데이터가 없습니다.</p>
-						{/if}
-					</tbody>
-				</table>
+			<div id="board-list">
+				<div class="container">
+					<table class="board-table" style="word-break:break-all; table-layout:auto;">
+						<thead>
+							<tr>
+								<th scope="col" class="th-num">번호</th>
+								<th scope="col" class="th-title">제목</th>
+								<th scope="col" class="th-date">등록일</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#if data.data}
+								{#each data.data as d, i}
+									<tr>
+										<td>{i + 1}</td>
+										<th>
+											<a href="/notice/view?id={JSON.parse(JSON.stringify(d)).DocumentNum}">
+												{JSON.parse(JSON.stringify(d)).Title.substr(0, 17)}...
+											</a>
+											<p />
+										</th>
+										<td
+											>{JSON.parse(JSON.stringify(d)).when.year}.{JSON.parse(JSON.stringify(d)).when
+												.month}.{JSON.parse(JSON.stringify(d)).when.date}</td
+										>
+									</tr>
+								{/each}
+							{:else}
+								<p>알림장 데이터가 없습니다.</p>
+							{/if}
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
+	</div>
 	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">
 		<div class="container">

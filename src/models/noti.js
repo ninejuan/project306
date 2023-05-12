@@ -17,7 +17,8 @@ const notiSchema = new mongo.Schema({
     Writer: { type: String, required: true },
     Title: { type: String, required: true },
     Content: { type: String },
-    DocumentNum: { type: Number, required: true }
+    DocumentNum: { type: Number, required: true },
+    isEdited: { type: Boolean, default: false }
 })
 
 const notices = mongo.model(

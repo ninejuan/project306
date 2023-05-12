@@ -1,5 +1,38 @@
 <script>
 	export let data;
+
+	function removeReq() {
+		Swal.fire({
+			title: '시크릿 키를 입력하세요',
+			input: 'text',
+			inputAttributes: {
+				autocapitalize: 'off'
+			},
+			showCancelButton: true,
+			confirmButtonText: '확인',
+			showLoaderOnConfirm: true,
+			preConfirm: (login) => {
+				return fetch(`//api.github.com/users/${login}`)
+					.then((response) => {
+						if (!response.ok) {
+							throw new Error(response.statusText);
+						}
+						return response.json();
+					})
+					.catch((error) => {
+						Swal.showValidationMessage(`Request failed: ${error}`);
+					});
+			},
+			allowOutsideClick: () => !Swal.isLoading()
+		}).then((result) => {
+			if (result.isConfirmed) {
+				Swal.fire({
+					title: `${result.value.login}'s avatar`,
+					imageUrl: result.value.avatar_url
+				});
+			}
+		});
+	}
 </script>
 
 <body class="ct">
@@ -30,7 +63,7 @@
 	<br /><br /><br /><br /><br />
 	<div class="notiContent tWhite tBold notiViewer">
 		<h3><strong>{JSON.parse(JSON.stringify(data)).Title}</strong></h3>
-		<p class="">
+		<p>
 			<span class="tLime">
 				{JSON.parse(JSON.stringify(data)).Writer}
 			</span>
@@ -42,8 +75,15 @@
 			{JSON.parse(JSON.stringify(data)).when.hour}시
 			{JSON.parse(JSON.stringify(data)).when.minute}분
 		</p>
-		<hr style="width: 10vw; height: 3px; background-color: #fff;">
+		<hr style="width: 10vw; height: 3px; background-color: #fff;" />
 		<p>{@html JSON.parse(JSON.stringify(data)).Content}</p>
+		<button class="btn btn-danger" on:click|preventDefault={removeReq}> 삭제 </button>
+		<button
+			class="btn btn-primary"
+			on:click|preventDefault={(location.href = `/notice/edit?id=${data.DocumentNum}`)}
+		>
+			수정
+		</button>
 	</div>
 	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">

@@ -1,11 +1,13 @@
 import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../../models/noti.js'
+import { redirect } from '@sveltejs/kit';
 env.config();
 mongo.connect(`${process.env.MONGOSRV}`)
 
 export async function load({ url }) {
     delete mongo.connection.models['notices'];
+
     let docno = url.searchParams.get('id');
 
     try {
@@ -20,6 +22,7 @@ export async function load({ url }) {
             };
         } else {
             throw new Error('No data found');
+            redirect(302, '/notice')
         }
     } catch (error) {
         console.error(error);

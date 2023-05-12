@@ -15,15 +15,16 @@ function randomInt(min, max) {
 export const actions = {
     // @ts-ignore
     default: async ({ cookies, request }) => {
+        delete mongo.connection.models['notices'];
+        delete mongo.connection.models['secret'];
+
         const data = await request.formData();
 
         if (!data || !data.get('secretkey') || !data.get('writer') || !data.get('Title') || !data.get('content')) {
-            console.log('f4')
             throw redirect(302, '/notice/write');
         }
 
         const key = await keySchema.findOne({ key: data.get('secretkey') }).lean().exec();
-        console.log(key)
         if (!key) throw redirect(302, '/notice/write');
 
         const now = new Date();
@@ -38,7 +39,7 @@ export const actions = {
             },
             Writer: data.get('writer'),
             Title: data.get('Title'),
-            Content: data.get('content'),
+            Content: data.get('content').replace('<img', '<img width="70%" height="40%"'),
             DocumentNum: parseInt(`${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}${now.getMinutes() + now.getHours()}${randomInt(1000, 9999)}`)
         });
 
