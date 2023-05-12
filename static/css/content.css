@@ -71,4 +71,5 @@ h2 {
 
 .notiContent {
     margin-left: 10vw;
+    min-height: 50vh;
 }

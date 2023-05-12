@@ -1,25 +1,47 @@
-/* import env from "dotenv";
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import env from 'dotenv'
+import mongo from 'mongoose'
+import notiSchema from '../../../models/noti.js'
+import keySchema from '../../../models/secret.js'
+import { redirect } from '@sveltejs/kit';
 
 env.config();
+mongo.connect(`${process.env.MONGOSRV}`);
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAJ53fI-qsgMJ9HEdnYv6chv7c--BX6x1w",
-    authDomain: "svc-9e818.firebaseapp.com",
-    projectId: "svc-9e818",
-    storageBucket: "svc-9e818.appspot.com",
-    messagingSenderId: "379021395912",
-    appId: "1:379021395912:web:21e7213ee26e1544da22fd",
-    measurementId: "G-604T6K2N18"
-};
-
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-console.log('123')
-console.log(process.env.APIKEY) */
-
-export function load({ params }) {
-    return {};
+function randomInt(min, max) {
+    var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randomNum;
 }
+
+export const actions = {
+    // @ts-ignore
+    default: async ({ cookies, request }) => {
+        const data = await request.formData();
+
+        if (!data || !data.get('secretkey') || !data.get('writer') || !data.get('Title') || !data.get('content')) {
+            console.log('f4')
+            throw redirect(302, '/notice/write');
+        }
+
+        const key = await keySchema.findOne({ key: data.get('secretkey') }).lean().exec();
+        console.log(key)
+        if (!key) throw redirect(302, '/notice/write');
+
+        const now = new Date();
+
+        await notiSchema.create({
+            when: {
+                year: now.getFullYear(),
+                month: now.getMonth() + 1,
+                date: now.getDate(),
+                hour: now.getHours(),
+                minute: now.getMinutes()
+            },
+            Writer: data.get('writer'),
+            Title: data.get('Title'),
+            Content: data.get('content'),
+            DocumentNum: parseInt(`${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}${now.getMinutes() + now.getHours()}${randomInt(1000, 9999)}`)
+        });
+
+        throw redirect(302, '/notice');
+    }
+};

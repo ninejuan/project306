@@ -15,6 +15,6 @@ export async function load({ params }) {
                 ...notice,
                 _id: notice._id.toString()
             }
-        }) ?? [],
+        }).reverse() ?? [],
     };
 }

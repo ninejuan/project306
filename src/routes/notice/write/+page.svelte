@@ -18,36 +18,6 @@
 	}
 </script>
 
-<!-- <div class="notiEditor tBold">
-	<form action="/notice/write" method="POST" on:submit|preventDefault={submit}>
-		<div class="form-group">
-			<div class="formTitle col-xs-4">
-				<label for="title" class="tWhite formDes">
-					제목<span class="tRed">*</span>
-				</label><br />
-				<input type="text" id="notiTitle" name="title" class="form-control w-50" required />
-			</div>
-			<br />
-			<div class="formContent">
-				<label for="content" class="tWhite formDes">
-					내용<span class="tRed">*</span>
-				</label>
-				<input type="hidden" id="content" name="content" required /><br />
-				<p class="tMiddle parentnIF">
-					<iframe
-						src="/editor/toastui/index.html"
-						class="editorIF"
-						title="ToastUI Editor"
-						on:load={loadEditor}
-						bind:this={editor}
-					/>
-				</p>
-			</div>
-			<button type="submit" class="submitBtn btn btn-primary btn-lg">제출</button>
-		</div>
-	</form>
-</div> -->
-
 <body class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
@@ -77,16 +47,41 @@
 	<div class="notiEditor tBold">
 		<form action="/notice/write" method="POST" on:submit|preventDefault={submit}>
 			<div class="form-group">
-				<div class="formTitle col-xs-4">
-					<label for="title" class="tWhite formDes">
+				<div class="formTitle">
+					<label for="Title" class="tWhite formDes">
 						제목<span class="tRed">*</span>
 					</label><br />
-					<input type="text" id="notiInputData" name="title" class="form-control" maxlength="30" required />
+					<input
+						type="text"
+						id="notiInputData"
+						name="Title"
+						class="form-control"
+						maxlength="30"
+						required
+					/>
 					<br />
 					<label for="writer" class="tWhite formDes">
 						작성자<span class="tRed">*</span>
 					</label><br />
-					<input type="text" id="notiInputData" name="writer" class="form-control" maxlength="5" required />
+					<input
+						type="text"
+						id="notiInputData"
+						name="writer"
+						class="form-control"
+						maxlength="5"
+						required
+					/><br />
+					<label for="secretkey" class="tWhite formDes">
+						시크릿 키<span class="tRed">*</span>
+					</label><br />
+					<input 
+					type="password" 
+					id="notiInputData"
+					name="secretkey"
+					class="form-control"
+					autocomplete="off"
+					required
+					/>
 				</div>
 				<br />
 				<div class="formContent">
@@ -104,10 +99,12 @@
 						/>
 					</p>
 				</div>
+				<br /><br />
 				<button type="submit" class="submitBtn btn btn-primary btn-lg">제출</button>
 			</div>
 		</form>
 	</div>
+	<br /><br /><br />
 	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">
 		<div class="container">
