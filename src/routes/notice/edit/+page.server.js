@@ -11,15 +11,15 @@ export async function load({ url }) {
     delete mongo.connection.models['notices'];
     delete mongo.connection.models['secret'];
 
-    let data = await notiSchema.find({ DocumentNum: url.searchParams.get('id') }).lean().exec();
+    let data = await notiSchema.findOne({ DocumentNum: url.searchParams.get('id') }).lean().exec();
     if (!data) {
         redirect(302, '/notice');
     } else {
         return {
-            title: data[0].Title,
-            writer: data[0].Writer,
-            content: data[0].Content,
-            docno: data[0].DocumentNum
+            title: data.Title,
+            writer: data.Writer,
+            content: data.Content,
+            docno: data.DocumentNum
         };
     }
 }

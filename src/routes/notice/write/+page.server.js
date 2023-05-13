@@ -2,6 +2,7 @@ import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../../models/noti.js'
 import keySchema from '../../../models/secret.js'
+import ax from '../../../func/antiXss.js'
 import { redirect } from '@sveltejs/kit';
 
 env.config();
