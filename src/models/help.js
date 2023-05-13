@@ -6,7 +6,7 @@ import mongo from 'mongoose'
  * DocumentNum은 gen 후 중복 방지를 위해 미리 데이터 존재여부 결정.
  */
 
-const notiSchema = new mongo.Schema({
+const helpSchema = new mongo.Schema({
     when: {
         year: { type: Number, required: true },
         month: { type: Number, required: true },
@@ -22,8 +22,8 @@ const notiSchema = new mongo.Schema({
 })
 
 const notices = mongo.model(
-    "notices",
-    notiSchema
+    "help",
+    helpSchema
 )
 
 export default notices;
