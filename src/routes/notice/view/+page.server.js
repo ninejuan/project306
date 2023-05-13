@@ -21,8 +21,8 @@ export async function load({ url }) {
                 _id: data._id.toString()
             };
         } else {
-            throw new Error('No data found');
             redirect(302, '/notice')
+            throw new Error('No data found');
         }
     } catch (error) {
         console.error(error);

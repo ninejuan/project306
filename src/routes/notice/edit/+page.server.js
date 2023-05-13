@@ -37,8 +37,10 @@ export const actions = {
             throw redirect(302, '/notice/edit?id=' + data.get('id'));
         }
 
-        const key = await keySchema.findOne({ key: data.get('id') }).lean().exec();
-        if (!key) throw redirect(302, '/notice/edit?id=' + data.get('id'));
+        const key = await keySchema.findOne({ key: data.get('secretkey') }).lean().exec();
+        if (!key) return new Response({
+            msg: 'key is not valid'
+        }, { status: 400 });
 
         await notiSchema.updateOne(
             { DocumentNum: data.get('id') },

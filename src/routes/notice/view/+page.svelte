@@ -11,27 +11,21 @@
 			showCancelButton: true,
 			confirmButtonText: '확인',
 			showLoaderOnConfirm: true,
-			preConfirm: (login) => {
-				return fetch(`//api.github.com/users/${login}`)
+			preConfirm: (key) => {
+				return fetch(`/notice/remove?id=${data.DocumentNum}&key=${key}`)
 					.then((response) => {
-						if (!response.ok) {
-							throw new Error(response.statusText);
+						if (response.ok) {
+							location.href = '/notice';
+						} else {
+							Swal.showValidationMessage(`시크릿 키를 잘못 입력하셨어요`);
 						}
-						return response.json();
 					})
 					.catch((error) => {
-						Swal.showValidationMessage(`Request failed: ${error}`);
+						Swal.showValidationMessage(`시크릿 키를 잘못 입력하셨어요`);
 					});
 			},
 			allowOutsideClick: () => !Swal.isLoading()
-		}).then((result) => {
-			if (result.isConfirmed) {
-				Swal.fire({
-					title: `${result.value.login}'s avatar`,
-					imageUrl: result.value.avatar_url
-				});
-			}
-		});
+		})
 	}
 </script>
 

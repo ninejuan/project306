@@ -7,7 +7,7 @@
     function submit(event) {
         document.querySelector('#content').value = editor.contentWindow.tuiEditor.getHTML();
 
-        if (confirm('정말로 게시글을 수정하시겠습니까?\n\n※ 확인 버튼을 클릭하면 즉시 채용 포털에 반영됩니다.')) {
+        if (confirm('정말로 게시글을 수정하시겠습니까?\n\n※ 확인 버튼을 클릭하면 즉시 알림장 데이터베이스에 반영됩니다.')) {
             event.target.submit();
         }
     }
@@ -82,7 +82,7 @@
 						시크릿 키<span class="tRed">*</span>
 					</label><br />
 					<input 
-					type="password" 
+					type="text" 
 					id="notiInputData"
 					name="secretkey"
 					class="form-control"

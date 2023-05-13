@@ -80,7 +80,7 @@
 						시크릿 키<span class="tRed">*</span>
 					</label><br />
 					<input 
-					type="password" 
+					type="text" 
 					id="notiInputData"
 					name="secretkey"
 					class="form-control"
