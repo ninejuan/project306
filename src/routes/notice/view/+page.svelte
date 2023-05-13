@@ -68,6 +68,11 @@
 			{JSON.parse(JSON.stringify(data)).when.date}일,
 			{JSON.parse(JSON.stringify(data)).when.hour}시
 			{JSON.parse(JSON.stringify(data)).when.minute}분
+			{#if JSON.parse(JSON.stringify(data)).isEdited == true}
+			<span class="tRed">
+				(수정됨)
+			</span>
+			{/if}
 		</p>
 		<hr style="width: 10vw; height: 3px; background-color: #fff;" />
 		<p>{@html JSON.parse(JSON.stringify(data)).Content}</p>
