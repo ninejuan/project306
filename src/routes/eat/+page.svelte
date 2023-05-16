@@ -22,7 +22,8 @@
 						<a
 							class="nav-link scrollto"
 							href="/notice"
-							target="_blank">알림장</a
+							target="_blank"
+							rel="noopener noreferrer">알림장</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>

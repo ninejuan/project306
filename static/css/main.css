@@ -279,7 +279,7 @@ section.notice {
   float: right;
 }
 
-#notiInputData {
+#notiInputData, #phone, #phoneVerifyNumber {
   width: 75%;
 }
 
@@ -293,6 +293,17 @@ section.notice {
 
 .minh {
   min-height: 60vh;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.checkBox {
+  width: 19px;
+	height: 19px;
+  border: 2px solid #bcbcbc;
+  background-color: #131b2c;
 }
 
 /* Mobile */
@@ -318,7 +329,7 @@ section.notice {
     font-size: 32px;
   }
 
-  #notiInputData {
+  #notiInputData, #phone, #phoneVerifyNumber {
     width: 50%;
   }
 

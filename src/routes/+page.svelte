@@ -13,7 +13,9 @@
 						<a
 							class="nav-link scrollto"
 							href="/notice"
-							target="_blank">알림장</a
+							target="_blank"
+							rel="noopener noreferrer"
+							>알림장</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
@@ -38,7 +40,7 @@
 
 				<div class="col-sm-12 col-md-3">
 					<h6 style="font-family: 'Jua', sans-serif;">개발</h6>
-					<a>
+					<a rel="noopener noreferrer">
 						<img alt="Designed by JuanLee" src="/assets/profile.png" width="150" height="150" />
 					</a>
 				</div>

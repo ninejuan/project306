@@ -1,19 +1,123 @@
 <script>
 	export let data;
+	let editor;
+	import { onMount } from 'svelte';
+	import { initializeApp } from 'firebase/app';
+	import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
+
+	onMount(() => {
+		const firebaseConfig = {
+			apiKey: data.secrets.apiKey,
+			authDomain: data.secrets.authDomain,
+			projectId: data.secrets.projectId,
+			storageBucket: data.secrets.storageBucket,
+			messagingSenderId: data.secrets.messagingSenderId,
+			appId: data.secrets.appId
+		};
+
+		initializeApp(firebaseConfig);
+		window.fbAuth = getAuth();
+		window.fbAuth.languageCode = 'ko';
+
+		window.recaptchaVerifier = new RecaptchaVerifier(
+			'recaptcha-container',
+			{
+				size: 'invisible'
+			},
+			window.fbAuth
+		);
+	});
+
+	function phoneVerify(event) {
+		if (
+			document.querySelector('#phone').value.length < 10 ||
+			/^010-?([0-9]{4})-?([0-9]{4})$/.test(document.querySelector('#phone').value) == false
+		) {
+			alert('전화번호를 정확히 입력하세요.');
+			return;
+		}
+
+		if (!window.confirmationResult) {
+			window.recaptchaVerifier.render().then((widgetId) => {
+				window.recaptchaWidgetId = widgetId;
+			});
+
+			signInWithPhoneNumber(
+				window.fbAuth,
+				document.querySelector('#phone').value.replace('0', '+82'),
+				window.recaptchaVerifier
+			)
+				.then((confirmationResult) => {
+					window.confirmationResult = confirmationResult;
+
+					document.querySelector('#phoneVerifyNumber').classList.remove('hidden');
+
+					event.target.textContent = '인증번호 확인';
+
+					alert('인증번호가 ' + document.querySelector('#phone').value + ' 번으로 발송되었습니다.');
+				})
+				.catch((error) => {
+					alert(
+						'인증번호 발송에 실패했습니다. 다시 시도해 주세요.\n\n오류가 지속될 경우 관리자에게 문의해 주세요.'
+					);
+					console.error(error);
+				});
+		} else {
+			window.confirmationResult
+				.confirm(document.querySelector('#phoneVerifyNumber').value)
+				.then((result) => {
+					window.phoneVerifyData = result.user;
+
+					alert('인증에 성공했습니다.');
+
+					document.querySelector('#phone').readOnly = true;
+					document.querySelector('#phoneVerifyNumber').readOnly = true;
+
+					event.target.classList.remove('hover:bg-[#ee2012]');
+					event.target.textContent = '인증 성공';
+					event.target.disabled = true;
+
+					console.log(window.phoneVerifyData);
+
+					phoneVerify = () => {};
+				})
+				.catch((error) => {
+					alert('인증번호가 일치하지 않습니다. 다시 시도해 주세요.');
+					console.error(error);
+				});
+		}
+	}
+
+	function submit(event) {
+		if (!window.phoneVerifyData) {
+			alert('전화번호 인증을 진행해 주세요.');
+			return;
+		} else {
+			document.querySelector('#content').value = editor.contentWindow.tuiEditor.getHTML();
+
+			if (confirm('선생님께 이 내용을 전달하시겠습니까?')) {
+				event.target.submit();
+			}
+		}
+	}
+
+	function loadEditor() {
+		editor.contentWindow.loadEditor();
+	}
 </script>
 
-<body>
+<body class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
-			<h1 class="logo"><a href="/" class="title" style="text-decoration: none;">306 ㅣ 급식</a></h1>
+			<h1 class="logo">
+				<a href="/" class="title" style="text-decoration: none;">306 ㅣ 익명건의</a>
+			</h1>
 
 			<nav id="navbar" class="navbar">
 				<ul>
 					<li>
-						<a
-							class="nav-link scrollto"
-							href="/notice"
-							target="_blank">알림장</a
+						<a class="nav-link scrollto" href="/notice" target="_blank" rel="noopener noreferrer"
+							>알림장</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
@@ -28,7 +132,97 @@
 			</nav>
 		</div>
 	</header>
-	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;"/>
+	<link rel="stylesheet" href="/css/content.css" />
+	<br /><br /><br /><br /><br /><br />
+	<div class="notiEditor tBold">
+		<div class="page-title">
+			<div class="container">
+				<h3 class="tWhite">선생님께 익명으로 알리기</h3>
+			</div>
+		</div>
+		<form action="/call" method="POST" on:submit|preventDefault={submit}>
+			<div class="form-group">
+				<div class="formTitle">
+					<label for="Title" class="tWhite formDes">
+						제목<span class="tRed">*</span>
+					</label><br />
+					<input
+						type="text"
+						id="notiInputData"
+						name="Title"
+						class="form-control"
+						maxlength="30"
+						required
+					/>
+					<br />
+					<label for="secretkey" class="tWhite formDes">
+						시크릿 키<span class="tRed">*</span>
+					</label><br />
+					<input
+						type="text"
+						id="notiInputData"
+						name="secretkey"
+						class="form-control"
+						autocomplete="off"
+						required
+					/><br />
+					<!-- 여기서부터 휴대폰 인증 -->
+					<label for="phone" class="tWhite formDes flex gap-1 text-gray-100 font-light mb-1"
+						>연락처
+						<span class="tRed">*</span>
+						<span class="tSmoodyRed">(010 형식 번호만 가능)</span>
+					</label><br />
+					<input
+						type="tel"
+						id="phone"
+						name="phone"
+						class="form-control"
+						pattern="010([0-9]{'{'}8{'}'})"
+						required
+					/><br />
+					<input
+						type="text"
+						id="phoneVerifyNumber"
+						name="phoneVerifyNumber"
+						placeholder="인증번호 입력"
+						class="form-control hidden"
+						pattern="([0-9]{'{'}6{'}'})"
+						autocomplete="one-time-code"
+					/>
+					<button type="button" class="btn btn-primary" on:click|preventDefault={phoneVerify}
+						>전화번호 인증</button
+					>
+				</div>
+				<br />
+				<div class="formContent">
+					<label for="content" class="tWhite formDes">
+						내용<span class="tRed">*</span>
+					</label>
+					<input type="hidden" id="content" name="content" required /><br />
+					<p class="tMiddle parentnIF">
+						<iframe
+							src="/editor/toastui/index.html"
+							class="editorIF"
+							title="ToastUI Editor"
+							on:load={loadEditor}
+							bind:this={editor}
+						/>
+					</p>
+				</div>
+				<br /><br />
+				<input type="checkbox" name="privacy" class="checkBox" />
+				<label for="privacy" class="tWhite formDes">
+					본인은
+					<a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>을
+					확인하였고 이에 동의합니다.
+				</label>
+				<div id="recaptcha-container" />
+				<button type="submit" class="submitBtn btn btn-primary btn-lg">전송</button>
+			</div>
+		</form>
+	</div>
+	<br /><br /><br />
+	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">
