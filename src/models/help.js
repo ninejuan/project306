@@ -14,7 +14,7 @@ const helpSchema = new mongo.Schema({
         hour: { type: Number, required: true },
         minute: { type: Number, required: true }
     },
-    ip: { type: String, required: true },
+    phone: { type: String, required: true },
     Title: { type: String, required: true },
     Content: { type: String },
     DocumentNum: { type: Number, required: true }

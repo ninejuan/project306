@@ -89,9 +89,11 @@
 	}
 
 	function submit(event) {
-		if (!window.phoneVerifyData) {
+		if (!window.phoneVerifyData || !document.getElementById('phoneVerifyNumber')) {
 			alert('전화번호 인증을 진행해 주세요.');
 			return;
+		} else if (!document.getElementById('privacy').checked) {
+			return alert('개인정보처리방침에 동의해주세요.')
 		} else {
 			document.querySelector('#content').value = editor.contentWindow.tuiEditor.getHTML();
 
@@ -209,14 +211,17 @@
 						/>
 					</p>
 				</div>
-				<br /><br />
-				<input type="checkbox" name="privacy" class="checkBox" />
-				<label for="privacy" class="tWhite formDes">
-					본인은
-					<a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>을
-					확인하였고 이에 동의합니다.
-				</label>
+				<div class="warningContent">
+					<input type="checkbox" name="privacy" class="checkBox" id="privacy" />
+					<label for="privacy" class="tWhite formDes">
+						본인은
+						<a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>을
+						확인하였고 이에 동의합니다.
+					</label>
+					<p class="tSmoodyRed">* 전송이 완료되면 자동으로 메인 페이지로 이동됩니다.</p>
+				</div>
 				<div id="recaptcha-container" />
+				<br /><br /><br />
 				<button type="submit" class="submitBtn btn btn-primary btn-lg">전송</button>
 			</div>
 		</form>

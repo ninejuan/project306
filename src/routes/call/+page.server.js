@@ -1,5 +1,6 @@
 import env from 'dotenv'
 import mongo from 'mongoose'
+import nodemailer from 'nodemailer'
 import helpSchema from '../../models/help.js'
 import keySchema from '../../models/secret'
 import { redirect } from '@sveltejs/kit';
@@ -8,8 +9,30 @@ import { getAnalytics } from "firebase/analytics";
 env.config();
 mongo.connect(`${process.env.MONGOSRV}`)
 
+function randomInt(min, max) {
+    var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randomNum;
+}
+
+async function sendMail() {
+    let transporter = nodemailer.createTransport({
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        secure: true,
+        auth: {
+            user: process.env.MAIL_USERNAME,
+            pass: process.env.MAIL_PASSWORD,
+        },
+    });
+    let info = await transporter.sendMail({
+        from: process.env.MAIL_SENDER,
+        to: process.env.MAIL_RECEIVER,
+        subject: `[306 익명전송] 제목추가`,
+        html: `html 가져오기 (form replace)`
+    })
+}
 export async function load({ url }) {
-    delete mongo.connection.models['help'];delete mongo.connection.models['secret'];
+    delete mongo.connection.models['help']; delete mongo.connection.models['secret'];
 
     return {
         secrets: {
@@ -31,7 +54,6 @@ export const actions = {
         delete mongo.connection.models['secret'];
 
         const data = await request.formData();
-        console.log(data.get('privacy'))
         if (!data || !data.get('secretkey') || !data.get('Title') || !data.get('content') || !data.get('privacy')) {
             throw redirect(302, '/call');
         }
@@ -41,7 +63,7 @@ export const actions = {
 
         const now = new Date();
 
-        await helpSchema.create({
+        let db = {
             when: {
                 year: now.getFullYear(),
                 month: now.getMonth() + 1,
@@ -49,12 +71,26 @@ export const actions = {
                 hour: now.getHours(),
                 minute: now.getMinutes()
             },
-            ip: data.get('writer'),
+            phone: data.get('phone'),
             Title: data.get('Title'),
             Content: data.get('content').replace('<img', '<img width="70%" height="40%"'),
             DocumentNum: parseInt(`${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}${now.getMinutes() + now.getHours()}${randomInt(1000, 9999)}`)
+        }
+
+        await helpSchema.create({
+            when: {
+                year: db.when.year,
+                month: db.when.month,
+                date: db.when.date,
+                hour: db.when.hour,
+                minute: db.when.minute
+            },
+            phone: db.phone,
+            Title: db.Title,
+            Content: db.Content,
+            DocumentNum: db.DocumentNum
         });
 
-        throw redirect(302, '/notice');
+        throw redirect(302, '/call');
     }
 };

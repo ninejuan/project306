@@ -306,6 +306,11 @@ section.notice {
   background-color: #131b2c;
 }
 
+.warningContent {
+  float: right;
+  display: block;
+}
+
 /* Mobile */
 @media all and (max-width: 769px) {
   #secretInput {
