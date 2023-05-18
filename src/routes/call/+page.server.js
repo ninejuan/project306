@@ -1,6 +1,7 @@
 import env from 'dotenv'
 import mongo from 'mongoose'
 import nodemailer from 'nodemailer'
+import fs from 'fs'
 import helpSchema from '../../models/help.js'
 import keySchema from '../../models/secret'
 import { redirect } from '@sveltejs/kit';
@@ -14,7 +15,19 @@ function randomInt(min, max) {
     return randomNum;
 }
 
-async function sendMail() {
+async function sendMail(title, content, when, docno) {
+    let html;
+    fs.readFile('/mailform/index.html', function (error, response) {
+        html = response.toString()
+            .replace('%title%', `${title}`)
+            .replace('%year%', `${when.year}`)
+            .replace('%month%', `${when.month}`)
+            .replace('%date%', `${when.date}`)
+            .replace('%docno%', `${docno}`)
+            .replace('%hour%', `${when.hour}`)
+            .replace('%minute%', `${when.minute}`)
+            .replace('%content%', `${content}`)
+    })
     let transporter = nodemailer.createTransport({
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,
@@ -27,8 +40,8 @@ async function sendMail() {
     let info = await transporter.sendMail({
         from: process.env.MAIL_SENDER,
         to: process.env.MAIL_RECEIVER,
-        subject: `[306 익명전송] 제목추가`,
-        html: `html 가져오기 (form replace)`
+        subject: `[306 익명전송] ${title}`,
+        html: `${html}`
     })
 }
 export async function load({ url }) {
@@ -91,6 +104,12 @@ export const actions = {
             DocumentNum: db.DocumentNum
         });
 
-        throw redirect(302, '/call');
+        await sendMail(db.Title, db.Content, {year: db.when.year, month: db.when.month, date: db.when.date, hour: db.when.hour, minute: db.when.minute}, db.DocumentNum)
+        .then(() => {
+            throw redirect(302, '/');
+        })
+        .catch(() => {
+            throw redirect(302, '/call')
+        })
     }
 };

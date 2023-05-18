@@ -218,10 +218,12 @@
 						<a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>을
 						확인하였고 이에 동의합니다.
 					</label>
-					<p class="tSmoodyRed">* 전송이 완료되면 자동으로 메인 페이지로 이동됩니다.</p>
+					<p class="tSmoodyRed">* 전송이 완료되면 자동으로 메인 페이지로 이동됩니다.
+						<br>이 페이지에 머문다면 관리자에게 문의해주세요.
+					</p>
 				</div>
 				<div id="recaptcha-container" />
-				<br /><br /><br />
+				<br /><br /><br /><br />
 				<button type="submit" class="submitBtn btn btn-primary btn-lg">전송</button>
 			</div>
 		</form>
