@@ -89,18 +89,18 @@
 	}
 
 	function submit(event) {
-		if (!window.phoneVerifyData || !document.getElementById('phoneVerifyNumber')) {
-			alert('전화번호 인증을 진행해 주세요.');
-			return;
-		} else if (!document.getElementById('privacy').checked) {
-			return alert('개인정보처리방침에 동의해주세요.')
-		} else {
+		// if (!window.phoneVerifyData || !document.getElementById('phoneVerifyNumber')) {
+		// 	alert('전화번호 인증을 진행해 주세요.');
+		// 	return;
+		// } else if (!document.getElementById('privacy').checked) {
+		// 	return alert('개인정보처리방침에 동의해주세요.')
+		// } else {
 			document.querySelector('#content').value = editor.contentWindow.tuiEditor.getHTML();
 
 			if (confirm('선생님께 이 내용을 전달하시겠습니까?')) {
 				event.target.submit();
 			}
-		}
+		// }
 	}
 
 	function loadEditor() {
@@ -169,7 +169,7 @@
 						required
 					/><br />
 					<!-- 여기서부터 휴대폰 인증 -->
-					<label for="phone" class="tWhite formDes flex gap-1 text-gray-100 font-light mb-1"
+					<!-- <label for="phone" class="tWhite formDes flex gap-1 text-gray-100 font-light mb-1"
 						>연락처
 						<span class="tRed">*</span>
 						<span class="tSmoodyRed">(010 형식 번호만 가능)</span>
@@ -193,7 +193,7 @@
 					/>
 					<button type="button" class="btn btn-primary" on:click|preventDefault={phoneVerify}
 						>전화번호 인증</button
-					>
+					> -->
 				</div>
 				<br />
 				<div class="formContent">

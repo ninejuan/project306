@@ -18,7 +18,7 @@ function randomInt(min, max) {
 async function sendMail(title, content, when, docno) {
     let html;
     fs.readFile('/mailform/index.html', function (error, response) {
-        html = response.toString()
+        html = `${response}`.toString()
             .replace('%title%', `${title}`)
             .replace('%year%', `${when.year}`)
             .replace('%month%', `${when.month}`)
@@ -84,7 +84,7 @@ export const actions = {
                 hour: now.getHours(),
                 minute: now.getMinutes()
             },
-            phone: data.get('phone'),
+            phone: '01090489898',
             Title: data.get('Title'),
             Content: data.get('content').replace('<img', '<img width="70%" height="40%"'),
             DocumentNum: parseInt(`${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}${now.getMinutes() + now.getHours()}${randomInt(1000, 9999)}`)
@@ -108,8 +108,6 @@ export const actions = {
         .then(() => {
             throw redirect(302, '/');
         })
-        .catch(() => {
-            throw redirect(302, '/call')
-        })
+        throw redirect(302, '/call')
     }
 };
