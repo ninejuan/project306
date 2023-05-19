@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer'
 import fs from 'fs'
 import helpSchema from '../../models/help.js'
 import keySchema from '../../models/secret'
+import htmlTemplate from '../../mailForm.js'
 import { redirect } from '@sveltejs/kit';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -16,9 +17,7 @@ function randomInt(min, max) {
 }
 
 async function sendMail(title, content, when, docno) {
-    let html;
-    fs.readFile('/mailform/index.html', function (error, response) {
-        html = `${response}`.toString()
+        let html = htmlTemplate.toString()
             .replace('%title%', `${title}`)
             .replace('%year%', `${when.year}`)
             .replace('%month%', `${when.month}`)
@@ -27,7 +26,6 @@ async function sendMail(title, content, when, docno) {
             .replace('%hour%', `${when.hour}`)
             .replace('%minute%', `${when.minute}`)
             .replace('%content%', `${content}`)
-    })
     let transporter = nodemailer.createTransport({
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,

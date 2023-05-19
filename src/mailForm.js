@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+let html = `<!DOCTYPE html>
 <html lang="ko">
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -441,8 +441,8 @@
     }
 </style>
 
-<body style="background-color: #111827; ">
-    <br><br>
+<body style="background-color: #111827; font-size:larger;">
+    <br>
     <div style="
             margin-left: 10vw;
             min-height: 50vh; 
@@ -450,29 +450,30 @@
             font-weight: bolder; 
             font-family: 'jamsil', 'sans-serif';
             min-height: 40vh;">
-        <h3 class="font-size: 28px;
+        <h3 style="font-size: 30px;
         color: #fff;
         font-weight: 400;
         text-align: center;
         font-family: 'jamsil', 'sans-serif';"><strong>%title%</strong></h3>
-        <br>
-        <p>
-            <span style="color: lime;">
+        <p style="font-size: 18px;">
+            <span style="color: lime !important;">
                 %docno%
             </span>
-
-            |
+            <br>
             %year%년
             %month%월
             %date%일,
             %hour%시
             %minute%분
         </p>
+        <hr style="width: 90vw; height: 3px; background-color: #fff;" />
+        <p style="font-size: 30px;">%content%</p>
         <br>
-        <hr style="width: 10vw; height: 3px; background-color: #fff;" />
-        <br>
-        <p>%content%</p>
+        <p style="color: rgb(255, 146, 146)">*상단 초록색 숫자는 문서열람번호입니다.<br>
+        만일 작성자의 신원정보가 필요한 경우 관리자에게 문서열람번호와 함께 열람 의사를 전달해주세요.</p>
     </div>
 </body>
 
-</html>
+</html>`
+
+export default html;
