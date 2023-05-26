@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer'
 import fs from 'fs'
 import helpSchema from '../../models/help.js'
 import keySchema from '../../models/secret'
-import htmlTemplate from '../../mailForm.js'
+import htmlTemplate from '../../form.js'
 import { redirect } from '@sveltejs/kit';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -17,7 +17,7 @@ function randomInt(min, max) {
 }
 
 async function sendMail(title, content, when, docno) {
-        let html = htmlTemplate.toString()
+        let html = htmlTemplate.html.toString()
             .replace('%title%', `${title}`)
             .replace('%year%', `${when.year}`)
             .replace('%month%', `${when.month}`)

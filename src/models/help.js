@@ -18,7 +18,7 @@ const helpSchema = new mongo.Schema({
     Title: { type: String, required: true },
     Content: { type: String },
     DocumentNum: { type: Number, required: true }
-})
+});
 
 const notices = mongo.model(
     "help",

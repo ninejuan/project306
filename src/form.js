@@ -476,4 +476,12 @@ let html = `<!DOCTYPE html>
 
 </html>`
 
-export default html;
+let privacy = ``;
+
+let term = ``;
+
+export default {
+    html: html,
+    privacy: privacy,
+    term: term
+};

@@ -89,18 +89,18 @@
 	}
 
 	function submit(event) {
-		// if (!window.phoneVerifyData || !document.getElementById('phoneVerifyNumber')) {
-		// 	alert('전화번호 인증을 진행해 주세요.');
-		// 	return;
-		// } else if (!document.getElementById('privacy').checked) {
-		// 	return alert('개인정보처리방침에 동의해주세요.')
-		// } else {
+		if (!window.phoneVerifyData || !document.getElementById('phoneVerifyNumber')) {
+			alert('전화번호 인증을 진행해 주세요.');
+			return;
+		} else if (!document.getElementById('privacy').checked) {
+			return alert('개인정보처리방침에 동의해주세요.')
+		} else {
 			document.querySelector('#content').value = editor.contentWindow.tuiEditor.getHTML();
 
 			if (confirm('선생님께 이 내용을 전달하시겠습니까?')) {
 				event.target.submit();
 			}
-		// }
+		}
 	}
 
 	function loadEditor() {
@@ -169,7 +169,7 @@
 						required
 					/><br />
 					<!-- 여기서부터 휴대폰 인증 -->
-					<!-- <label for="phone" class="tWhite formDes flex gap-1 text-gray-100 font-light mb-1"
+					<label for="phone" class="tWhite formDes flex gap-1 text-gray-100 font-light mb-1"
 						>연락처
 						<span class="tRed">*</span>
 						<span class="tSmoodyRed">(010 형식 번호만 가능)</span>
@@ -193,7 +193,7 @@
 					/>
 					<button type="button" class="btn btn-primary" on:click|preventDefault={phoneVerify}
 						>전화번호 인증</button
-					> -->
+					>
 				</div>
 				<br />
 				<div class="formContent">
@@ -214,9 +214,7 @@
 				<div class="warningContent">
 					<input type="checkbox" name="privacy" class="checkBox" id="privacy" />
 					<label for="privacy" class="tWhite formDes">
-						본인은
-						<a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>을
-						확인하였고 이에 동의합니다.
+						작성하신 개인정보는 선생님께만 전달되며, 이용목적 이외로는 사용되지 않습니다. 동의하십니까?
 					</label>
 					<p class="tSmoodyRed">* 전송이 완료되면 자동으로 메인 페이지로 이동됩니다.
 						<br>이 페이지에 머문다면 관리자에게 문의해주세요.
