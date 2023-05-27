@@ -29,18 +29,34 @@
 	<link rel="stylesheet" href="/css/content.css" />
 	<br /><br /><br /><br />
 	<div class="commonView" />
-	<div class="pcView"><br>
+	<div class="pcView">
+		<br />
 		<!--PC, Tablet-->
-		<div class="mainIntro tWhite tBold">
-			<h1>프로젝트 306</h1>
-			<h2>아래 버튼으로 페이지를 옮겨가세요.</h2>
+		<div class="mainIntro tWhite tBold fRight">
+			<h1 class="cProjectName">프로젝트 306</h1>
+			<h2 class="cProjectDescription">당신의 학교 생활에 필요한 모든 정보를 제공합니다.</h2>
 		</div>
-	<br></div>
+		<br /><br /><br /><br /><br /><br /><br /><br /><br />
+		<div class="pContent tWhite fLeft">
+			<h3 class="tSmoodyRed tBold">*WARNING*</h3>
+			<h5 class="tBold">* 본 사이트는 길음중학교 3학년 6반 학생들만을 위한 사이트입니다.</h5><br />
+		</div>
+		<br /><br /><br /><br /><br /><br /><br /><br /><br />
+		<div class="tWhite fRight">
+			<h3 class="tLightOrange tBold">*NOTICE*</h3>
+			<h5 class="tBold">* 반갑습니다. 좀 둘러보시겠어요?</h5>
+			<a class="oGreenBold btn btn-outline-success " href="/notice">알림장</a>
+			<a class="oBlueBold btn btn-outline-primary " href="/schedule">시간표</a>
+			<a class="oBlueBold btn btn-outline-primary " href="/eat">급식</a>
+			<a class="oRedBold btn btn-outline-danger " href="/call">익명건의</a>
+		</div>
+		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	</div>
 	<div class="mobileView">
 		<!--Mobile-->
 		<div class="mainIntro tWhite">
-			<h1 class="projectName">프로젝트 306</h1>
-			<h2 class="projectDescription">아래 버튼으로 페이지를 옮겨가세요.</h2>
+			<h1 class="mProjectName">프로젝트 306</h1>
+			<h2 class="mProjectDescription">아래 버튼으로 페이지를 옮겨가세요.</h2>
 		</div>
 		<div class="selectMenu">
 			<a class="btn btn-outline-light oBold" href="/notice">알림장</a>

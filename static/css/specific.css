@@ -249,7 +249,28 @@
 .pBorder {
     border: 5px solid rgb(255, 200, 99);
 }
+
+/* Outline or Border */
 .oBold {
     /* outline bold */
     border: 2px solid white !important;
+}
+.oRedBold {
+    border: 2px solid red !important;
+}
+.oBlueBold {
+    border: 2px solid blue !important;
+}
+.oGreenBold {
+    border: 2px solid green !important;
+}
+
+/* Float */
+.fLeft {
+    float: left;
+    margin-left: 13vw;
+}
+.fRight {
+    float: right;
+    margin-right: 15vw;
 }

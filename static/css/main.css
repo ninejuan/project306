@@ -279,7 +279,9 @@ section.notice {
   float: right;
 }
 
-#notiInputData, #phone, #phoneVerifyNumber {
+#notiInputData,
+#phone,
+#phoneVerifyNumber {
   width: 75%;
 }
 
@@ -301,7 +303,7 @@ section.notice {
 
 .checkBox {
   width: 19px;
-	height: 19px;
+  height: 19px;
   border: 2px solid #bcbcbc;
   background-color: #131b2c;
 }
@@ -315,19 +317,31 @@ section.notice {
   font-family: 'jamsil', 'sans-serif' !important;
 }
 
-.pcView {
-  float: right;
-  margin-right: 10vw;
-}
+.pContent {}
 
-.projectName {
+.pcView {}
+
+.mProjectName {
   font-size: 33px;
   font-family: 'jamsil', 'sans-serif';
   font-weight: bold;
   color: white;
 }
 
-.projectDescription {
+.mProjectDescription {
+  font-size: 20px;
+  font-family: 'jamsil', 'sans-serif';
+  color: white;
+}
+
+.cProjectName {
+  font-size: 55px;
+  font-family: 'jamsil', 'sans-serif';
+  font-weight: bold;
+  color: white;
+}
+
+.cProjectDescription {
   font-size: 20px;
   font-family: 'jamsil', 'sans-serif';
   color: white;
@@ -344,9 +358,11 @@ section.notice {
   .mobileView {
     display: block;
   }
+
   .pcView {
     display: none;
   }
+
   #secretInput {
     width: 20%;
   }
@@ -357,12 +373,15 @@ section.notice {
   .mobileView {
     display: block;
   }
+
   .pcView {
     display: none;
   }
+
   .copyright {
     font-size: 30px;
   }
+
   #secretInput {
     width: 10px;
   }
@@ -373,20 +392,25 @@ section.notice {
   .pcView {
     display: block;
   }
+
   .mobileView {
     display: none;
   }
+
   .copyright {
     font-size: 32px;
   }
 
-  #notiInputData, #phone, #phoneVerifyNumber {
+  #notiInputData,
+  #phone,
+  #phoneVerifyNumber {
     width: 50%;
   }
 
   #secretInput {
     width: 40%
   }
+
   .notiEditor {
     width: 100vw;
   }
