@@ -30,6 +30,7 @@
 		"dotenv": "^16.0.3",
 		"firebase": "^9.22.0",
 		"firebase-tools": "^11.28.0",
+		"https-proxy-agent": "^7.0.0",
 		"mongoose": "^7.1.2",
 		"nodemailer": "^6.9.2",
 		"request": "^2.88.2",

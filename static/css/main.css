@@ -311,6 +311,15 @@ section.notice {
   display: block;
 }
 
+.mainIntro {
+  font-family: 'jamsil', 'sans-serif' !important;
+}
+
+.pcView {
+  float: right;
+  margin-right: 10vw;
+}
+
 /* Mobile */
 @media all and (max-width: 769px) {
   .mobileView {

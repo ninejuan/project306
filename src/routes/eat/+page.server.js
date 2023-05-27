@@ -3,6 +3,8 @@ import axios from 'axios'
 import env from 'dotenv'
 env.config();
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 function getWeekDate() {
     const day = new Date().getDay();
     if (day == 0 || day == 6) {
@@ -24,7 +26,7 @@ function getWeekDate() {
         if (monday.getDate() < 10) {
             date = `0${monday.getDate()}`
         }
-        
+
 
         return `${year}${month}${date}`
     } else {
@@ -46,7 +48,7 @@ function getWeekDate() {
         if (monday.getDate() < 10) {
             date = `0${monday.getDate()}`
         }
-        
+
 
         return `${year}${month}${date}`
     }
@@ -81,11 +83,11 @@ export async function load({ params }) {
     try {
         const response = await axios.get(options.uri, options);
         const data = response.data.mealServiceDietInfo[1].row;
-    
+
         return {
-          data,
+            data,
         };
-      } catch (error) {
+    } catch (error) {
         throw error;
-      }
+    }
 }

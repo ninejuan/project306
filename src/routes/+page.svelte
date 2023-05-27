@@ -29,26 +29,24 @@
 	<link rel="stylesheet" href="/css/content.css" />
 	<br /><br /><br /><br />
 	<div class="commonView" />
-	<div class="pcView">
+	<div class="pcView"><br>
 		<!--PC, Tablet-->
-		<p class="tWhite">PC 환경</p>
-		<div class="mainIntro tWhite">
+		<div class="mainIntro tWhite tBold">
 			<h1>프로젝트 306</h1>
 			<h2>아래 버튼으로 페이지를 옮겨가세요.</h2>
 		</div>
-	</div>
+	<br></div>
 	<div class="mobileView">
 		<!--Mobile-->
-		<p class="tWhite">Mobile 환경</p>
-		<div class="mainIntro tWhite">
+		<div class="mainIntro tWhite tBold">
 			<h1>프로젝트 306</h1>
 			<h2>아래 버튼으로 페이지를 옮겨가세요.</h2>
 		</div>
 		<div class="selectMenu">
-			<button class="btn btn-outline-light oBold" onclick="location.href='/notice'">알림장</button>
-			<button class="btn btn-outline-light oBold" onclick="location.href='/schedule'">시간표</button>
-			<button class="btn btn-outline-light oBold" onclick="location.href='/eat'">급식</button>
-			<button class="btn btn-outline-light oBold" onclick="location.href='/call'">익명건의</button>
+			<a class="btn btn-outline-light oBold" href="/notice">알림장</a>
+			<a class="btn btn-outline-light oBold" href="/schedule">시간표</a>
+			<a class="btn btn-outline-light oBold" href="/eat">급식</a>
+			<a class="btn btn-outline-light oBold" href="/call">익명건의</a>
 		</div>
 	</div>
 	<br />
