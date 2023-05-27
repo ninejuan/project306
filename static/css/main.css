@@ -313,6 +313,12 @@ section.notice {
 
 /* Mobile */
 @media all and (max-width: 769px) {
+  .mobileView {
+    display: block;
+  }
+  .pcView {
+    display: none;
+  }
   #secretInput {
     width: 20%;
   }
@@ -320,6 +326,12 @@ section.notice {
 
 /* Tablet */
 @media all and (min-width: 769px) and (max-width: 1024px) {
+  .mobileView {
+    display: block;
+  }
+  .pcView {
+    display: none;
+  }
   .copyright {
     font-size: 30px;
   }
@@ -330,6 +342,12 @@ section.notice {
 
 /* PC */
 @media all and (min-width: 1025px) {
+  .pcView {
+    display: block;
+  }
+  .mobileView {
+    display: none;
+  }
   .copyright {
     font-size: 32px;
   }

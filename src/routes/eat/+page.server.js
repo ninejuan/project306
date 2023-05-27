@@ -1,4 +1,5 @@
 import req from 'request'
+import axios from 'axios'
 import env from 'dotenv'
 env.config();
 
@@ -55,7 +56,7 @@ export async function load({ params }) {
     const options = {
         method: 'GET',
         uri: 'https://open.neis.go.kr/hub/mealServiceDietInfo',
-        qs: {
+        params: {
             KEY: process.env.NEISAPIKEY,
             Type: 'json',
             ATPT_OFCDC_SC_CODE: process.env.SCHOOL_REGION,
@@ -65,16 +66,26 @@ export async function load({ params }) {
         },
     };
 
-    return new Promise((resolve, reject) => {
-        req(options, (err, resp, body) => {
-            if (err) {
-                reject(err);
-            } else {
-                const data = JSON.parse(body).mealServiceDietInfo[1].row;
-                resolve({
-                    data
-                });
-            }
-        });
-    });
+    // return new Promise((resolve, reject) => {
+    //     req(options, (err, resp, body) => {
+    //         if (err) {
+    //             reject(err);
+    //         } else {
+    //             const data = JSON.parse(body).mealServiceDietInfo[1].row;
+    //             resolve({
+    //                 data
+    //             });
+    //         }
+    //     });
+    // });
+    try {
+        const response = await axios.get(options.uri, options);
+        const data = response.data.mealServiceDietInfo[1].row;
+    
+        return {
+          data,
+        };
+      } catch (error) {
+        throw error;
+      }
 }

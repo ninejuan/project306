@@ -2,32 +2,57 @@
 	export let data;
 </script>
 
-<body>
+<body class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
-			<h1 class="logo"><a href="/" class="title" style="text-decoration: none;">306 ㅣ 급식</a></h1>
+			<h1 class="logo"><a href="/" class="title" style="text-decoration: none;">306</a></h1>
 
 			<nav id="navbar" class="navbar">
 				<ul>
 					<li>
-						<a
-							class="nav-link scrollto"
-							href="/notice"
-							target="_blank"
-							rel="noopener noreferrer"
+						<a class="nav-link scrollto" href="/notice" target="_blank" rel="noopener noreferrer"
 							>알림장</a
 						>
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
 					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
 					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
-		
 				</ul>
-				<i id="mobile-arrow-btn" class="fas fa-arrow-left mobile-nav-toggle" onclick="history.back()" />
+				<i
+					id="mobile-arrow-btn"
+					class="fas fa-arrow-left mobile-nav-toggle"
+					onclick="history.back()"
+				/>
 			</nav>
 		</div>
 	</header>
-	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;"/>
+	<link rel="stylesheet" href="/css/content.css" />
+	<br /><br /><br /><br />
+	<div class="commonView" />
+	<div class="pcView">
+		<!--PC, Tablet-->
+		<p class="tWhite">PC 환경</p>
+		<div class="mainIntro tWhite">
+			<h1>프로젝트 306</h1>
+			<h2>아래 버튼으로 페이지를 옮겨가세요.</h2>
+		</div>
+	</div>
+	<div class="mobileView">
+		<!--Mobile-->
+		<p class="tWhite">Mobile 환경</p>
+		<div class="mainIntro tWhite">
+			<h1>프로젝트 306</h1>
+			<h2>아래 버튼으로 페이지를 옮겨가세요.</h2>
+		</div>
+		<div class="selectMenu">
+			<button class="btn btn-outline-light oBold" onclick="location.href='/notice'">알림장</button>
+			<button class="btn btn-outline-light oBold" onclick="location.href='/schedule'">시간표</button>
+			<button class="btn btn-outline-light oBold" onclick="location.href='/eat'">급식</button>
+			<button class="btn btn-outline-light oBold" onclick="location.href='/call'">익명건의</button>
+		</div>
+	</div>
+	<br />
+	<hr style="width: 85vw; height: 2px; background-color:white; margin: 0 auto; border: 0;" />
 	<footer class="site-footer" id="sf">
 		<div class="container">
 			<div class="row">
