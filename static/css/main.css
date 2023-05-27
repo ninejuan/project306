@@ -320,6 +320,25 @@ section.notice {
   margin-right: 10vw;
 }
 
+.projectName {
+  font-size: 33px;
+  font-family: 'jamsil', 'sans-serif';
+  font-weight: bold;
+  color: white;
+}
+
+.projectDescription {
+  font-size: 20px;
+  font-family: 'jamsil', 'sans-serif';
+  color: white;
+}
+
+.selectMenu {
+  font-size: 20px;
+  font-family: 'jamsil', 'sans-serif';
+  color: white;
+}
+
 /* Mobile */
 @media all and (max-width: 769px) {
   .mobileView {

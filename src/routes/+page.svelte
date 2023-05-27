@@ -38,9 +38,9 @@
 	<br></div>
 	<div class="mobileView">
 		<!--Mobile-->
-		<div class="mainIntro tWhite tBold">
-			<h1>프로젝트 306</h1>
-			<h2>아래 버튼으로 페이지를 옮겨가세요.</h2>
+		<div class="mainIntro tWhite">
+			<h1 class="projectName">프로젝트 306</h1>
+			<h2 class="projectDescription">아래 버튼으로 페이지를 옮겨가세요.</h2>
 		</div>
 		<div class="selectMenu">
 			<a class="btn btn-outline-light oBold" href="/notice">알림장</a>
