@@ -112,7 +112,7 @@
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
 			<h1 class="logo">
-				<a href="/" class="title" style="text-decoration: none;">306 ㅣ 익명건의</a>
+				<a href="/" class="title" style="text-decoration: none;">306 ㅣ 개인문의</a>
 			</h1>
 
 			<nav id="navbar" class="navbar">
@@ -124,7 +124,7 @@
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
 					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
-					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
+					<li><a class="nav-link scrollto" href="/call">개인문의</a></li>
 				</ul>
 				<i
 					id="mobile-arrow-btn"

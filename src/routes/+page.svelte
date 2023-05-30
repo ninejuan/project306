@@ -16,7 +16,7 @@
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
 					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
-					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
+					<li><a class="nav-link scrollto" href="/call">개인문의</a></li>
 				</ul>
 				<i
 					id="mobile-arrow-btn"
@@ -39,30 +39,51 @@
 		<br /><br /><br /><br /><br /><br /><br /><br /><br />
 		<div class="pContent tWhite fLeft">
 			<h3 class="tSmoodyRed tBold">*WARNING*</h3>
-			<h5 class="tBold">* 본 사이트는 길음중학교 3학년 6반 학생들만을 위한 사이트입니다.</h5><br />
+			<h5 class="tBold">* 본 사이트는 길음중학교 3학년 6반 학생들만을 위한 사이트입니다.</h5>
+			<br />
 		</div>
 		<br /><br /><br /><br /><br /><br /><br /><br /><br />
 		<div class="tWhite fRight">
 			<h3 class="tLightOrange tBold">*NOTICE*</h3>
 			<h5 class="tBold">* 반갑습니다. 좀 둘러보시겠어요?</h5>
-			<a class="oGreenBold btn btn-outline-success " href="/notice">알림장</a>
-			<a class="oBlueBold btn btn-outline-primary " href="/schedule">시간표</a>
-			<a class="oBlueBold btn btn-outline-primary " href="/eat">급식</a>
-			<a class="oRedBold btn btn-outline-danger " href="/call">익명건의</a>
+			<a class="oGreenBold btn btn-outline-success" href="/notice">알림장</a>
+			<a class="oBlueBold btn btn-outline-primary" href="/schedule">시간표</a>
+			<a class="oBlueBold btn btn-outline-primary" href="/eat">급식</a>
+			<a class="oRedBold btn btn-outline-danger" href="/call">개인문의</a>
 		</div>
 		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 	</div>
 	<div class="mobileView">
 		<!--Mobile-->
-		<div class="mainIntro tWhite">
+		<div class="mainIntro tWhite tMiddle">
 			<h1 class="mProjectName">프로젝트 306</h1>
-			<h2 class="mProjectDescription">아래 버튼으로 페이지를 옮겨가세요.</h2>
+			<h2 class="mProjectDescription">학교 생활에 필요한 모든 것.</h2>
 		</div>
+		<span style="line-height: 5vh;"><br /></span>
+		<div class="pContent tWhite fLeft">
+			<h3 class="tLightOrange tBold">*TODAY*</h3>
+			<h5 class="tBold">* {data.str}</h5>
+			<br />
+		</div>
+		<br />
+		<span style="line-height: 10vh;"><br /></span>
 		<div class="selectMenu">
-			<a class="btn btn-outline-light oBold" href="/notice">알림장</a>
-			<a class="btn btn-outline-light oBold" href="/schedule">시간표</a>
-			<a class="btn btn-outline-light oBold" href="/eat">급식</a>
-			<a class="btn btn-outline-light oBold" href="/call">익명건의</a>
+			<a id="btnFullWidth" class="btn btnL" href="/notice">
+				알림장<br>
+				<span class="badge badge-light desSpan">학급의 알림장입니다</span>
+			</a>
+			<a id="btnFullWidth" class="btn btnR" href="/schedule">
+				시간표<br>
+				<span class="badge badge-light desSpan">우리 학급의 시간표입니다</span>
+			</a>
+			<a id="btnFullWidth" class="btn btnL" href="/eat">
+				급식<br>
+				<span class="badge badge-light desSpan">오늘의 급식은 뭘까요?</span>
+			</a>
+			<a id="btnFullWidth" class="btn btnR" href="/call">
+				개인문의<br>
+				<span class="badge badge-light desSpan">비밀스럽게 문의하세요</span>
+			</a>
 		</div>
 	</div>
 	<br />

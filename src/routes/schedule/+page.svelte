@@ -33,7 +33,7 @@
 					</li>
 					<li><a class="nav-link scrollto" href="/schedule">시간표</a></li>
 					<li><a class="nav-link scrollto" href="/eat">급식</a></li>
-					<li><a class="nav-link scrollto" href="/call">익명건의</a></li>
+					<li><a class="nav-link scrollto" href="/call">개인문의</a></li>
 		
 				</ul>
 				<i
