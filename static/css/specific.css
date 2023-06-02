@@ -274,6 +274,9 @@
     float: right;
     margin-right: 15vw;
 }
+.fMiddle {
+    float: middle;
+}
 
 /* Vertically Align */
 .vLineMiddle {

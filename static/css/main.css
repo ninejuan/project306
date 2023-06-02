@@ -419,6 +419,12 @@ section.notice {
   padding-top: 12vw;
 }
 
+.mEsContent {
+  /* Mobile Essential Content (공지, 알림장)의 약어 */
+  margin: 0 auto;
+  text-align: center;
+}
+
 /* Mobile */
 @media all and (max-width: 769px) {
   .mobileView {

@@ -80,6 +80,36 @@
 			<h2 class="mProjectDescription tSmoodyOrange">학교 생활에 필요한 모든 것.</h2>
 		</div>
 		<span style="line-height: 5vh;"><br /></span>
+		<div class="mEsContent">
+			<h3 class="tWhite tBold">알림장</h3>
+			<hr style="width: 15vw; height: 2px; background-color:white; border: 0; margin: 0 auto;" />
+			<div class="notiBox">
+				{#if typeof data.noti == 'object'}
+					{#each data.noti as noti, index}
+						<div class="sepNotibox">
+							<a href={data.noti[index].url} class="tWhite tNoDec"
+								>{JSON.parse(JSON.stringify(data.noti[index].title))}</a
+							>
+							<br />
+						</div>
+					{/each}
+				{:else}
+					<p class="tWhite">{@html data.noti}</p>
+				{/if}
+			</div>
+			<h3 class="tWhite tBold">급식</h3>
+			<hr style="width: 50vw; height: 2px; background-color:white; border: 0; margin: 0 auto;" />
+			<div class="mealBox">
+				{#if data.meal.status}
+					<div class="sepmealBox">
+						<p class="tWhite">{data.meal.menu[0].MLSV_YMD}</p>
+						<p class="tWhite">{@html data.meal.menu[0].DDISH_NM}</p>
+					</div>
+				{:else}
+					<p class="tWhite">{@html data.eat}</p>
+				{/if}
+			</div>
+		</div>
 		<div class="pContent tWhite fLeft">
 			<h3 class="tLightOrange tBold">*TODAY*</h3>
 			<h5 class="tBold">* {data.str}</h5>
