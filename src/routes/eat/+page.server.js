@@ -1,4 +1,3 @@
-import req from 'request'
 import axios from 'axios'
 import env from 'dotenv'
 env.config();
@@ -67,19 +66,7 @@ export async function load({ params }) {
             MLSV_FROM_YMD: parseInt(getWeekDate()),
         },
     };
-
-    // return new Promise((resolve, reject) => {
-    //     req(options, (err, resp, body) => {
-    //         if (err) {
-    //             reject(err);
-    //         } else {
-    //             const data = JSON.parse(body).mealServiceDietInfo[1].row;
-    //             resolve({
-    //                 data
-    //             });
-    //         }
-    //     });
-    // });
+    
     try {
         const response = await axios.get(options.uri, options);
         const data = response.data.mealServiceDietInfo[1].row;

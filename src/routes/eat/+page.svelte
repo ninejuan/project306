@@ -42,7 +42,7 @@
 		<div class="meals">
 			<h2 class="tWhite cTitle">이번 주의 급식 정보</h2>
 			{#each meals as meal, i}
-				<div class="eachC">
+				<div class="mContent">
 					<h3 class="cProviderData">
 						<span class="mealSchoolname">{meal.SCHUL_NM}</span>
 						<br />

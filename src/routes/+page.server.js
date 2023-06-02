@@ -1,3 +1,13 @@
+import notiSchema from '../models/noti'
+import axios from 'axios'
+import env from 'dotenv'
+import mongo from 'mongoose'
+env.config();
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+mongo.connect(`${process.env.MONGOSRV}`)
+
 const strs = {
     date: {
         weekend: [
@@ -70,8 +80,85 @@ function getRandomItemFromArray(arr) {
     return item;
 }
 
+/** 급식 요청에 필요한 날짜 리턴하는 함수 */
+function getWeekDate() {
+    const baseDate = new Date();
+
+    const year = baseDate.getFullYear();
+    let month = baseDate.getMonth() + 1;
+    let date = baseDate.getDate();
+
+    // 5월을 05월로 변환
+    if (baseDate.getMonth() < 10) {
+        month = `0${baseDate.getMonth() + 1}`;
+    }
+    if (baseDate.getDate() < 10) {
+        date = `0${baseDate.getDate()}`
+    }
+
+    return `${year}${month}${date}`
+}
+
+/** 오늘의 급식 받아오는 코드 */
+async function getTodayMeal() {
+    const options = {
+        method: 'GET',
+        uri: 'https://open.neis.go.kr/hub/mealServiceDietInfo',
+        params: {
+            KEY: process.env.NEISAPIKEY,
+            Type: 'json',
+            ATPT_OFCDC_SC_CODE: process.env.SCHOOL_REGION,
+            SD_SCHUL_CODE: process.env.SCHOOL_CODE,
+            pSize: 1,
+            MLSV_FROM_YMD: parseInt(getWeekDate()),
+        },
+    };
+
+    try {
+        const response = await axios.get(options.uri, options);
+        const data = response.data.mealServiceDietInfo[1].row;
+
+        return {
+            status: true,
+            menu: data
+        };
+    } catch (error) {
+        return {
+            status: false,
+            menu: null
+        };
+    }
+}
+
+/** Num에 들어온 값만큼 알림장 가져와서 리턴하는 함수 */
+async function getNoti(num) {
+    const data = (await notiSchema.find().lean().exec()).reverse();
+    let notices = [];
+    if (data) {
+        for (let i=0; i<num; i++) {
+            data[i] ? notices.push({
+                title: data[i].Title,
+                url: `/notice/view?id=${data[i].DocumentNum}`
+            }) : notices.push({
+                title: '',
+                url: `/`
+            })
+        }
+    } else {
+        notices.push({
+            title: '존재하지 않아요',
+            url: '/'
+        })
+    }
+    return notices;
+}
+
 export function load({ params }) {
+    delete mongo.connection.models['notices'];
+
     return {
-        str: getRandomString()
+        str: getRandomString(),
+        meal: getTodayMeal(),
+        noti: getNoti(3)
     };
 }

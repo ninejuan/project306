@@ -274,3 +274,8 @@
     float: right;
     margin-right: 15vw;
 }
+
+/* Vertically Align */
+.vLineMiddle {
+    vertical-align: middle;
+}
