@@ -415,6 +415,10 @@ section.notice {
   padding: 20px;
 }
 
+.cMainData {
+  padding-top: 12vw;
+}
+
 /* Mobile */
 @media all and (max-width: 769px) {
   .mobileView {
