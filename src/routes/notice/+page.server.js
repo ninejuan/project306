@@ -7,7 +7,7 @@ mongo.connect(`${process.env.MONGOSRV}`)
 // Noti view page
 
 export async function load({ params }) {
-    delete mongo.connection.models['notices'];elete mongo.connection.models['notices'];
+    delete mongo.connection.models['notices']; delete mongo.connection.models['notices'];
     const data = await notiSchema.find().lean().exec();
     return {
         data: data.map(notice => {
