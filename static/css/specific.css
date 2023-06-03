@@ -274,11 +274,21 @@
     float: right;
     margin-right: 15vw;
 }
-.fMiddle {
-    float: middle;
+.mainFLeft {
+    float: left;
+    margin-left: 15vw;
+}
+.mainFRight {
+    float: right;
+    margin-right: 20vw;
 }
 
 /* Vertically Align */
 .vLineMiddle {
     vertical-align: middle;
+}
+
+/* Font */
+.fJamsil {
+    font-family: 'jamsil', sans-serif;
 }

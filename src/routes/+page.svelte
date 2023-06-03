@@ -1,6 +1,12 @@
 <script>
 	export let data = [];
-	console.log(data.meal.menu);
+
+	function convertYMD(date) {
+		let year = `${date}`.slice(0, 4);
+		let month = `${date}`.slice(4, 6);
+		let day = `${date}`.slice(6, 8);
+		return `${year}년 ${month}월 ${day}일`;
+	}
 </script>
 
 <body class="ct">
@@ -37,7 +43,7 @@
 			<h2 class="cProjectDescription tSmoodyOrange">당신의 학교 생활에 필요한 모든 정보를 제공합니다.</h2>
 		</div>
 		<div class="cMainData vLineMiddle">
-			<div class="fLeft">
+			<div class="mainFLeft">
 				<h3 class="tWhite tBold">알림장</h3>
 				<hr style="width: 10vw; height: 2px; background-color:white; border: 0;" />
 				<div class="notiBox">
@@ -55,13 +61,13 @@
 					{/if}
 				</div>
 			</div>
-			<div class="fRight">
+			<div class="mainFRight">
 				<h3 class="tWhite tBold">급식</h3>
 				<hr style="width: 10vw; height: 2px; background-color:white; border: 0;" />
 				<div class="mealBox">
 					{#if data.meal.status}
 						<div class="sepmealBox">
-							<p class="tWhite">{data.meal.menu[0].MLSV_YMD}</p>
+							<p class="tWhite">{convertYMD(data.meal.menu[0].MLSV_YMD)}</p>
 							<p class="tWhite">{@html data.meal.menu[0].DDISH_NM}</p>
 						</div>
 					{:else}
@@ -81,13 +87,13 @@
 		</div>
 		<span style="line-height: 5vh;"><br /></span>
 		<div class="mEsContent">
-			<h3 class="tWhite tBold">알림장</h3>
+			<h3 class="tWhite tBold fJamsil">알림장</h3>
 			<hr style="width: 15vw; height: 2px; background-color:white; border: 0; margin: 0 auto;" />
 			<div class="notiBox">
 				{#if typeof data.noti == 'object'}
 					{#each data.noti as noti, index}
 						<div class="sepNotibox">
-							<a href={data.noti[index].url} class="tWhite tNoDec"
+							<a href={data.noti[index].url} class="tWhite tNoDec fJamsil"
 								>{JSON.parse(JSON.stringify(data.noti[index].title))}</a
 							>
 							<br />
@@ -97,13 +103,13 @@
 					<p class="tWhite">{@html data.noti}</p>
 				{/if}
 			</div>
-			<h3 class="tWhite tBold">급식</h3>
+			<h3 class="tWhite tBold fJamsil">급식</h3>
 			<hr style="width: 50vw; height: 2px; background-color:white; border: 0; margin: 0 auto;" />
 			<div class="mealBox">
 				{#if data.meal.status}
 					<div class="sepmealBox">
-						<p class="tWhite">{data.meal.menu[0].MLSV_YMD}</p>
-						<p class="tWhite">{@html data.meal.menu[0].DDISH_NM}</p>
+						<p class="tWhite">{convertYMD(data.meal.menu[0].MLSV_YMD)}</p>
+						<p class="tWhite fJamsil">{@html data.meal.menu[0].DDISH_NM}</p>
 					</div>
 				{:else}
 					<p class="tWhite">{@html data.eat}</p>
@@ -120,7 +126,7 @@
 		<div class="selectMenu">
 			<a id="btnFullWidth" class="btn btnL" href="/notice">
 				알림장<br />
-				<span class="badge badge-light desSpan">학급의 알림장입니다</span>
+				<span class="badge badge-light desSpan">학급의 알림장</span>
 			</a>
 			<a id="btnFullWidth" class="btn btnR" href="/schedule">
 				시간표<br />
@@ -128,7 +134,7 @@
 			</a>
 			<a id="btnFullWidth" class="btn btnL" href="/eat">
 				급식<br />
-				<span class="badge badge-light desSpan">오늘의 급식은 뭘까요?</span>
+				<span class="badge badge-light desSpan">이번주 급식</span>
 			</a>
 			<a id="btnFullWidth" class="btn btnR" href="/call">
 				개인문의<br />
