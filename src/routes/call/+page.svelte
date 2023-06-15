@@ -214,10 +214,10 @@
 				<div class="warningContent">
 					<input type="checkbox" name="privacy" class="checkBox" id="privacy" />
 					<label for="privacy" class="tWhite formDes">
-						작성하신 개인정보는 선생님께만 전달되며, 이용목적 이외로는 사용되지 않습니다. 동의하십니까?
+						작성하신 개인정보는 DB에 저장됩니다. 동의하십니까?
 					</label>
 					<p class="tSmoodyRed">* 전송이 완료되면 자동으로 메인 페이지로 이동됩니다.
-						<br>이 페이지에 머문다면 관리자에게 문의해주세요.
+						<br>계속 이 페이지에 머문다면 관리자에게 문의해주세요.
 					</p>
 				</div>
 				<div id="recaptcha-container" />
