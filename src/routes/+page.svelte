@@ -1,5 +1,6 @@
 <script>
 	export let data = [];
+	console.log(data)
 
 	function convertYMD(date) {
 		let year = `${date}`.slice(0, 4);
@@ -48,16 +49,16 @@
 				<hr style="width: 10vw; height: 2px; background-color:white; border: 0;" />
 				<div class="notiBox">
 					{#if typeof data.noti == 'object'}
-						{#each data.noti as noti, index}
+						{#each data?.noti as noti, index}
 							<div class="sepNotibox">
-								<a href={data.noti[index].url} class="tWhite tNoDec"
-									>{JSON.parse(JSON.stringify(data.noti[index].title))}</a
+								<a href={data?.noti[index]?.url} class="tWhite tNoDec"
+									>{JSON.parse(JSON.stringify(data?.noti[index]?.title))}</a
 								>
 								<br />
 							</div>
 						{/each}
 					{:else}
-						<p class="tWhite">{@html data.noti}</p>
+						<p class="tWhite">{@html data?.noti}</p>
 					{/if}
 				</div>
 			</div>
@@ -67,11 +68,11 @@
 				<div class="mealBox">
 					{#if data.meal.status}
 						<div class="sepmealBox">
-							<p class="tWhite">{convertYMD(data.meal.menu[0].MLSV_YMD)}</p>
-							<p class="tWhite">{@html data.meal.menu[0].DDISH_NM}</p>
+							<p class="tWhite">{convertYMD(data?.meal?.menu[0]?.MLSV_YMD)}</p>
+							<p class="tWhite">{@html data?.meal?.menu[0]?.DDISH_NM}</p>
 						</div>
 					{:else}
-						<p class="tWhite">{@html data.eat}</p>
+						<p class="tWhite">{@html data?.eat}</p>
 					{/if}
 				</div>
 			</div>
@@ -93,32 +94,32 @@
 				{#if typeof data.noti == 'object'}
 					{#each data.noti as noti, index}
 						<div class="sepNotibox">
-							<a href={data.noti[index].url} class="tWhite tNoDec fJamsil"
-								>{JSON.parse(JSON.stringify(data.noti[index].title))}</a
+							<a href={data?.noti[index]?.url} class="tWhite tNoDec fJamsil"
+								>{JSON.parse(JSON.stringify(data?.noti[index]?.title))}</a
 							>
 							<br />
 						</div>
 					{/each}
 				{:else}
-					<p class="tWhite">{@html data.noti}</p>
+					<p class="tWhite">{@html data?.noti}</p>
 				{/if}
 			</div>
 			<h3 class="tWhite tBold fJamsil">급식</h3>
 			<hr style="width: 50vw; height: 2px; background-color:white; border: 0; margin: 0 auto;" />
 			<div class="mealBox">
-				{#if data.meal.status}
+				{#if data?.meal?.status}
 					<div class="sepmealBox">
-						<p class="tWhite">{convertYMD(data.meal.menu[0].MLSV_YMD)}</p>
-						<p class="tWhite fJamsil">{@html data.meal.menu[0].DDISH_NM}</p>
+						<p class="tWhite">{convertYMD(data?.meal?.menu[0]?.MLSV_YMD)}</p>
+						<p class="tWhite fJamsil">{@html data?.meal?.menu[0]?.DDISH_NM}</p>
 					</div>
 				{:else}
-					<p class="tWhite">{@html data.eat}</p>
+					<p class="tWhite">{@html data?.eat}</p>
 				{/if}
 			</div>
 		</div>
 		<div class="pContent tWhite fLeft">
 			<h3 class="tLightOrange tBold">*TODAY*</h3>
-			<h5 class="tBold">* {data.str}</h5>
+			<h5 class="tBold">* {data?.str}</h5>
 			<br />
 		</div>
 		<br />

@@ -101,6 +101,7 @@ function getWeekDate() {
 
 /** 오늘의 급식 받아오는 코드 */
 async function getTodayMeal() {
+    console.log(parseInt(getWeekDate()))
     const options = {
         method: 'GET',
         uri: 'https://open.neis.go.kr/hub/mealServiceDietInfo',
@@ -114,20 +115,13 @@ async function getTodayMeal() {
         },
     };
 
-    try {
-        const response = await axios.get(options.uri, options);
-        const data = response.data.mealServiceDietInfo[1].row;
+    const response = await axios.get(options.uri, options);
+    const data = response.data.mealServiceDietInfo ? response.data.mealServiceDietInfo[1].row : '오늘의 급식이 보이지 않아요.'
 
-        return {
-            status: true,
-            menu: data
-        };
-    } catch (error) {
-        return {
-            status: false,
-            menu: null
-        };
-    }
+    return {
+        status: true,
+        menu: data
+    };
 }
 
 /** Num에 들어온 값만큼 알림장 가져와서 리턴하는 함수 */
@@ -135,7 +129,7 @@ async function getNoti(num) {
     const data = (await notiSchema.find().lean().exec()).reverse();
     let notices = [];
     if (data) {
-        for (let i=0; i<num; i++) {
+        for (let i = 0; i < num; i++) {
             data[i] ? notices.push({
                 title: data[i].Title,
                 url: `/notice/view?id=${data[i].DocumentNum}`
