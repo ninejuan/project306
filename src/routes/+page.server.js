@@ -119,7 +119,6 @@ async function getTodayMeal() {
     const data = response.data.mealServiceDietInfo ? response.data.mealServiceDietInfo[1].row : '오늘의 급식이 보이지 않아요.'
 
     return {
-        status: true,
         menu: data
     };
 }

@@ -66,13 +66,13 @@
 				<h3 class="tWhite tBold">급식</h3>
 				<hr style="width: 10vw; height: 2px; background-color:white; border: 0;" />
 				<div class="mealBox">
-					{#if data.meal.status}
+					{#if data.meal.menu !== '오늘의 급식이 보이지 않아요.'}
 						<div class="sepmealBox">
 							<p class="tWhite">{convertYMD(data?.meal?.menu[0]?.MLSV_YMD)}</p>
 							<p class="tWhite">{@html data?.meal?.menu[0]?.DDISH_NM}</p>
 						</div>
 					{:else}
-						<p class="tWhite">{@html data?.eat}</p>
+						<p class="tWhite">{@html data?.meal.menu}</p>
 					{/if}
 				</div>
 			</div>
