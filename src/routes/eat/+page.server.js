@@ -66,15 +66,11 @@ export async function load({ params }) {
             MLSV_FROM_YMD: parseInt(getWeekDate()),
         },
     };
-    
-    try {
-        const response = await axios.get(options.uri, options);
-        const data = response.data.mealServiceDietInfo[1].row;
 
-        return {
-            data,
-        };
-    } catch (error) {
-        throw error;
-    }
+    const response = await axios.get(options.uri, options);
+    const data = response.data.mealServiceDietInfo ? response.data.mealServiceDietInfo[1].row : "오늘의 급식이 보이지 않아요.";
+
+    return {
+        data,
+    };
 }
