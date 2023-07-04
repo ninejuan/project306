@@ -1,6 +1,6 @@
 <script>
 	export let data = [];
-	console.log(data)
+	console.log(data);
 
 	function convertYMD(date) {
 		let year = `${date}`.slice(0, 4);
@@ -41,7 +41,9 @@
 		<!-- PC, Tablet -->
 		<div class="mainIntro tWhite tBold fRight">
 			<h1 class="cProjectName tOrange">프로젝트 306</h1>
-			<h2 class="cProjectDescription tSmoodyOrange">당신의 학교 생활에 필요한 모든 정보를 제공합니다.</h2>
+			<h2 class="cProjectDescription tSmoodyOrange">
+				당신의 학교 생활에 필요한 모든 정보를 제공합니다.
+			</h2>
 		</div>
 		<div class="cMainData vLineMiddle">
 			<div class="mainFLeft">
@@ -107,14 +109,12 @@
 			<h3 class="tWhite tBold fJamsil">급식</h3>
 			<hr style="width: 50vw; height: 2px; background-color:white; border: 0; margin: 0 auto;" />
 			<div class="mealBox">
-				{#if data?.meal?.status}
-					<div class="sepmealBox">
-						<p class="tWhite">{convertYMD(data?.meal?.menu[0]?.MLSV_YMD)}</p>
-						<p class="tWhite fJamsil">{@html data?.meal?.menu[0]?.DDISH_NM}</p>
-					</div>
-				{:else}
-					<p class="tWhite">{@html data?.eat}</p>
-				{/if}
+				<div class="sepmealBox">
+					<p class="tWhite">{convertYMD(data?.meal?.menu[0]?.MLSV_YMD)}</p>
+					<p class="tWhite fJamsil">
+						{@html data.meal.menu[0].DDISH_NM ?? '메뉴가 보이지 않아요.'}
+					</p>
+				</div>
 			</div>
 		</div>
 		<div class="pContent tWhite fLeft">
