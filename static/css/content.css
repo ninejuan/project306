@@ -1,86 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap');
-
-.content-flex:not(.cTitle) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    flex-direction:column;
-}
-
-.content-inline:not(.cTitle) {
-    display:contents;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    flex-direction:column;
-}
-
-.ScdMenu, .cProviderData {
-    display:inherit
-}
-
-.scContent {
-    width: auto;
-}
-
-body .ct {
-    background-color: #111827;
-}
-
-.eachC, .cProviderData, .mContent {
-    color: rgb(255, 255, 255);
-    padding: 20px;
-    margin: 20px;
-    border-radius: 10px;
-    font-family: 'jamsil', 'sans-serif';
-    font-size:larger;
-}
-
-.eachC {
-    width: 80vw;
-    border-color: white;
-    border-radius: 5px;
-    border: 1px solid white;
-}
-
-.mContent {
-    width: 40vw;
-    border-color: white;
-    border-radius: 5px;
-    border: 1px solid white;
-}
-
-@media all and (max-width: 768px) {
-    .cTitle {
-        font-size: 30px;
-        font-weight: bolder;
-        margin-bottom: 10px;
-        font-family: 'Jua', sans-serif;
-        flex-direction: row;
-    }
-}
-
-@media all and (min-width: 769px) {
-    .cTitle {
-        font-size: 50px;
-        font-weight: bolder;
-        margin-bottom: 10px;
-        font-family: 'Jua', sans-serif;
-        flex-direction: row;
-    }
-}
-
-h2 {
-    align-items: center;
-    flex-direction: row;
-}
-
-.notiContent {
-    margin-left: 10vw;
-    min-height: 50vh;
-}
-
-/* .meals {
-    width: 10vw;
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap');
+
+.content-flex:not(.cTitle) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction:column;
+}
+
+.content-inline:not(.cTitle) {
+    display:contents;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction:column;
+}
+
+.ScdMenu, .cProviderData {
+    display:inherit
+}
+
+.scContent {
+    width: auto;
+}
+
+body .ct {
+    background-color: #111827;
+}
+
+.eachC, .cProviderData, .mContent {
+    color: rgb(255, 255, 255);
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    font-family: 'jamsil', 'sans-serif';
+    font-size:larger;
+}
+
+.eachC {
+    width: 80vw;
+    border-color: white;
+    border-radius: 5px;
+    border: 1px solid white;
+}
+
+.mContent {
+    width: 40vw;
+    border-color: white;
+    border-radius: 5px;
+    border: 1px solid white;
+}
+
+@media all and (max-width: 768px) {
+    .cTitle {
+        font-size: 30px;
+        font-weight: bolder;
+        margin-bottom: 10px;
+        font-family: 'Jua', sans-serif;
+        flex-direction: row;
+    }
+}
+
+@media all and (min-width: 769px) {
+    .cTitle {
+        font-size: 50px;
+        font-weight: bolder;
+        margin-bottom: 10px;
+        font-family: 'Jua', sans-serif;
+        flex-direction: row;
+    }
+}
+
+h2 {
+    align-items: center;
+    flex-direction: row;
+}
+
+.notiContent {
+    margin-left: 10vw;
+    min-height: 50vh;
+}
+
+/* .meals {
+    width: 10vw;
 } */
