@@ -146,11 +146,26 @@ async function getNoti(num) {
 
 export async function load({ params }) {
     delete mongo.connection.models['notices'];
-    await connectDb();
+
+    let meal = { menu: '오늘의 급식이 보이지 않아요.' };
+    let noti = [];
+
+    try {
+        await connectDb();
+        noti = await getNoti(3);
+    } catch (error) {
+        console.error('getNoti failed', error);
+    }
+
+    try {
+        meal = await getTodayMeal();
+    } catch (error) {
+        console.error('getTodayMeal failed', error);
+    }
 
     return {
         str: getRandomString(),
-        meal: await getTodayMeal(),
-        noti: await getNoti(3)
+        meal,
+        noti
     };
 }
