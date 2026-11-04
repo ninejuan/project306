@@ -28,6 +28,16 @@ Cloudflare Workers Builds 설정:
 `.env.example`과 동일한 이름으로 등록해야 합니다. 등록하지 않으면
 MongoDB/메일/급식 API를 사용하는 페이지가 500을 반환합니다.
 
+plaintext variable은 배포 시 `wrangler.jsonc` 기준으로 덮어써지므로,
+민감한 값은 Secret으로 등록하세요. 한 번에 올리려면:
+
+```bash
+npx wrangler secret bulk .env --name <worker-name>
+```
+
+`wrangler.jsonc`의 `keep_vars: true`는 대시보드에서 설정한 plaintext variable을
+배포 후에도 유지합니다. (Secret은 배포로 삭제되지 않습니다.)
+
 배포 후 `GET /health`에서 환경변수 등록 여부와 MongoDB 연결 상태를 확인할 수 있습니다.
 
 ## Copyright

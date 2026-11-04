@@ -1,6 +1,7 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "project306",
+	"keep_vars": true,
 	"main": ".svelte-kit/cloudflare/_worker.js",
 	"compatibility_date": "2026-11-04",
 	"compatibility_flags": ["nodejs_compat"],
