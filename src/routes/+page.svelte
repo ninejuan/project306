@@ -54,7 +54,7 @@
 						{#each data?.noti as noti, index}
 							<div class="sepNotibox">
 								<a href={data?.noti[index]?.url} class="tWhite tNoDec"
-									>{JSON.parse(JSON.stringify(data?.noti[index]?.title))}</a
+									>{data?.noti?.[index]?.title ?? ''}</a
 								>
 								<br />
 							</div>
@@ -68,13 +68,13 @@
 				<h3 class="tWhite tBold">급식</h3>
 				<hr style="width: 10vw; height: 2px; background-color:white; border: 0;" />
 				<div class="mealBox">
-					{#if data.meal.menu !== '오늘의 급식이 보이지 않아요.'}
+					{#if data?.meal?.menu?.[0]?.DDISH_NM}
 						<div class="sepmealBox">
-							<p class="tWhite">{convertYMD(data?.meal?.menu[0]?.MLSV_YMD)}</p>
-							<p class="tWhite">{@html data?.meal?.menu[0]?.DDISH_NM}</p>
+							<p class="tWhite">{convertYMD(data.meal.menu[0].MLSV_YMD)}</p>
+							<p class="tWhite">{@html data.meal.menu[0].DDISH_NM}</p>
 						</div>
 					{:else}
-						<p class="tWhite">{@html data?.meal.menu}</p>
+						<p class="tWhite">{@html typeof data?.meal?.menu === 'string' ? data.meal.menu : '오늘의 급식이 보이지 않아요.'}</p>
 					{/if}
 				</div>
 			</div>
@@ -97,7 +97,7 @@
 					{#each data.noti as noti, index}
 						<div class="sepNotibox">
 							<a href={data?.noti[index]?.url} class="tWhite tNoDec fJamsil"
-								>{JSON.parse(JSON.stringify(data?.noti[index]?.title))}</a
+								>{data?.noti?.[index]?.title ?? ''}</a
 							>
 							<br />
 						</div>
@@ -109,12 +109,16 @@
 			<h3 class="tWhite tBold fJamsil">급식</h3>
 			<hr style="width: 50vw; height: 2px; background-color:white; border: 0; margin: 0 auto;" />
 			<div class="mealBox">
-				<div class="sepmealBox">
-					<p class="tWhite">{convertYMD(data?.meal?.menu[0]?.MLSV_YMD)}</p>
-					<p class="tWhite fJamsil">
-						{@html data.meal.menu[0].DDISH_NM ?? '메뉴가 보이지 않아요.'}
-					</p>
-				</div>
+				{#if data?.meal?.menu?.[0]?.DDISH_NM}
+					<div class="sepmealBox">
+						<p class="tWhite">{convertYMD(data.meal.menu[0].MLSV_YMD)}</p>
+						<p class="tWhite fJamsil">
+							{@html data.meal.menu[0].DDISH_NM}
+						</p>
+					</div>
+				{:else}
+					<p class="tWhite fJamsil">메뉴가 보이지 않아요.</p>
+				{/if}
 			</div>
 		</div>
 		<div class="pContent tWhite fLeft">

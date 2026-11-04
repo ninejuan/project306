@@ -7,3 +7,8 @@ export async function handle({ event, resolve }) {
 		await disconnectDb();
 	}
 }
+
+export function handleError({ error }) {
+	console.error(error);
+	return { message: error?.message ?? 'Internal Error' };
+}
