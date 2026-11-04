@@ -37,10 +37,27 @@ function todayYmd() {
 	return Number(`${now.getFullYear()}${month}${day}`);
 }
 
+function describeMongoUri(uri) {
+	if (!uri) return null;
+
+	try {
+		const parsed = new URL(uri);
+		return {
+			protocol: parsed.protocol,
+			host: parsed.hostname,
+			db: parsed.pathname.replace(/^\//, ''),
+			length: uri.length
+		};
+	} catch {
+		return { invalid: true, length: uri.length };
+	}
+}
+
 export async function GET() {
 	const result = {
 		env: Object.fromEntries(TRACKED.map((key) => [key, Boolean(env[key])])),
 		processEnv: Object.fromEntries(TRACKED.map((key) => [key, Boolean(process.env[key])])),
+		mongoUri: describeMongoUri(env.MONGOSRV),
 		readyState: mongoose.connection.readyState
 	};
 
