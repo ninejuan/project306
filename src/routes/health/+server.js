@@ -3,32 +3,6 @@ import { json } from '@sveltejs/kit';
 import axios from 'axios';
 import mongoose from 'mongoose';
 import { connectDb } from '../../lib/db.js';
-import notiSchema from '../../models/noti.js';
-
-const TRACKED = [
-	'MONGOSRV',
-	'NEISAPIKEY',
-	'SCHOOL_REGION',
-	'SCHOOL_CODE',
-	'SCHOOL_NAME',
-	'SCHOOL_GRADE',
-	'SCHOOL_CLASS',
-	'SCHOOL_REGION_KR',
-	'CALL_KEY',
-	'MAIL_HOST',
-	'MAIL_PORT',
-	'MAIL_USERNAME',
-	'MAIL_PASSWORD',
-	'MAIL_SENDER',
-	'MAIL_RECEIVER',
-	'FIREBASE_APIKEY',
-	'FIREBASE_AUTHDOMAIN',
-	'FIREBASE_PROJECTID',
-	'FIREBASE_STORAGEBUCKET',
-	'FIREBASE_MESSAGESENDERID',
-	'FIREBASE_APPID',
-	'FIREBASE_MEASUREMENTID'
-];
 
 function todayYmd() {
 	const now = new Date();
@@ -37,44 +11,16 @@ function todayYmd() {
 	return Number(`${now.getFullYear()}${month}${day}`);
 }
 
-function describeMongoUri(uri) {
-	if (!uri) return null;
-
-	try {
-		const parsed = new URL(uri);
-		return {
-			protocol: parsed.protocol,
-			host: parsed.hostname,
-			db: parsed.pathname.replace(/^\//, ''),
-			length: uri.length
-		};
-	} catch {
-		return { invalid: true, length: uri.length };
-	}
-}
-
 export async function GET() {
-	const result = {
-		env: Object.fromEntries(TRACKED.map((key) => [key, Boolean(env[key])])),
-		processEnv: Object.fromEntries(TRACKED.map((key) => [key, Boolean(process.env[key])])),
-		mongoUri: describeMongoUri(env.MONGOSRV),
-		readyState: mongoose.connection.readyState
-	};
+	const status = { ok: true, mongo: false, neis: false };
 
 	try {
 		await connectDb();
 		await mongoose.connection.db.admin().ping();
-		result.mongo = 'ok';
-
-		try {
-			result.notices = await notiSchema.countDocuments().exec();
-		} catch (error) {
-			result.notices = 'error';
-			result.noticesError = `${error.name}: ${error.message}`;
-		}
+		status.mongo = true;
 	} catch (error) {
-		result.mongo = 'error';
-		result.error = `${error.name}: ${error.message}`;
+		status.ok = false;
+		console.error('health: mongo check failed', error);
 	}
 
 	try {
@@ -87,17 +33,14 @@ export async function GET() {
 				pSize: 1,
 				MLSV_FROM_YMD: todayYmd()
 			},
-			timeout: 8000
+			timeout: 5000
 		});
-		result.neis = response.status;
-		result.neisHasData = Boolean(response.data?.mealServiceDietInfo);
-		result.neisCode = response.data?.RESULT?.CODE ?? null;
+		const code = response.data?.RESULT?.CODE;
+		status.neis = Boolean(response.data?.mealServiceDietInfo) || code === 'INFO-200';
 	} catch (error) {
-		result.neis = 'error';
-		result.neisError = `${error.name}: ${error.message}`;
+		status.ok = false;
+		console.error('health: neis check failed', error);
 	}
 
-	result.readyState = mongoose.connection.readyState;
-
-	return json(result);
+	return json(status, { status: status.ok ? 200 : 503 });
 }

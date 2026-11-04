@@ -38,7 +38,8 @@ npx wrangler secret bulk .env --name <worker-name>
 `wrangler.jsonc`의 `keep_vars: true`는 대시보드에서 설정한 plaintext variable을
 배포 후에도 유지합니다. (Secret은 배포로 삭제되지 않습니다.)
 
-배포 후 `GET /health`에서 환경변수 등록 여부와 MongoDB 연결 상태를 확인할 수 있습니다.
+배포 후 `GET /health`에서 `{ ok, mongo, neis }` 상태 요약을 확인할 수 있습니다.
+비정상이면 HTTP 503을 반환하며, 상세 원인은 Worker 로그에만 남습니다.
 
 ## Copyright
 위 코드는 GNU GPL 3.0 라이센스가 적용됩니다.
