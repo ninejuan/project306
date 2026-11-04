@@ -48,7 +48,7 @@
 				<i
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
-					onclick="history.back()"
+					onclick={() => history.back()}
 				/>
 			</nav>
 		</div>
@@ -76,10 +76,10 @@
 		</p>
 		<hr style="width: 10vw; height: 3px; background-color: #fff;" />
 		<p>{@html JSON.parse(JSON.stringify(data)).Content}</p>
-		<button class="btn btn-danger" on:click|preventDefault={removeReq}> 삭제 </button>
+		<button class="btn btn-danger" onclick={(event) => { event.preventDefault(); removeReq(); }}> 삭제 </button>
 		<button
 			class="btn btn-primary"
-			on:click|preventDefault={(location.href = `/notice/edit?id=${data.DocumentNum}`)}
+			onclick={(event) => { event.preventDefault(); location.href = `/notice/edit?id=${data.DocumentNum}`; }}
 		>
 			수정
 		</button>

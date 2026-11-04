@@ -3,7 +3,7 @@ import mongo from 'mongoose'
 import notiSchema from '../../../models/noti.js'
 import { redirect } from '@sveltejs/kit';
 env.config();
-mongo.connect(`${process.env.MONGOSRV}`)
+if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV)
 
 export async function load({ url }) {
     delete mongo.connection.models['notices'];

@@ -1,6 +1,4 @@
 <script>
-	import { each } from 'svelte/internal';
-
 	export let data;
 	function convertNumToKrDay(param) {
 		let res = `${param}`
@@ -39,7 +37,7 @@
 				<i
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
-					onclick="history.back()"
+					onclick={() => history.back()}
 				/>
 			</nav>
 		</div>

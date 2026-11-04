@@ -37,7 +37,7 @@
 				<i
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
-					onclick="history.back()"
+					onclick={() => history.back()}
 				/>
 			</nav>
 		</div>
@@ -50,7 +50,7 @@
 				<h3 class="tWhite">알림장 작성하기</h3>
 			</div>
 		</div>
-		<form action="/notice/write" method="POST" on:submit|preventDefault={submit}>
+		<form action="/notice/write" method="POST" onsubmit={(event) => { event.preventDefault(); submit(event); }}>
 			<div class="form-group">
 				<div class="formTitle">
 					<label for="Title" class="tWhite formDes">
@@ -99,7 +99,7 @@
 							src="/editor/toastui/index.html"
 							class="editorIF"
 							title="ToastUI Editor"
-							on:load={loadEditor}
+							onload={loadEditor}
 							bind:this={editor}
 						/>
 					</p>

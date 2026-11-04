@@ -2,7 +2,7 @@ import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../models/noti.js'
 env.config();
-mongo.connect(`${process.env.MONGOSRV}`)
+if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV)
 
 // Noti view page
 

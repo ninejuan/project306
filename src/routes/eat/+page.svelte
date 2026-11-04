@@ -33,7 +33,7 @@
 				<i
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
-					onclick="history.back()"
+					onclick={() => history.back()}
 				/>
 			</nav>
 		</div>

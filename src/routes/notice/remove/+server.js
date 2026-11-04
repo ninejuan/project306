@@ -6,7 +6,7 @@ import keySchema from '../../../models/secret.js'
 import { redirect } from '@sveltejs/kit';
 
 env.config();
-mongo.connect(`${process.env.MONGOSRV}`);
+if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV);
 
 export const GET = async ({ request, url }) => {
     delete mongo.connection.models['notices'];

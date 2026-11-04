@@ -6,7 +6,7 @@ env.config();
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-mongo.connect(`${process.env.MONGOSRV}`)
+if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV)
 
 const strs = {
     date: {
@@ -146,12 +146,12 @@ async function getNoti(num) {
     return notices;
 }
 
-export function load({ params }) {
-    delete mongo.connection.models['notices'];
-
-    return {
-        str: getRandomString(),
-        meal: getTodayMeal(),
-        noti: getNoti(3)
-    };
+export async function load({ params }) {
+    delete mongo.connection.models['notices'];
+
+    return {
+        str: getRandomString(),
+        meal: await getTodayMeal(),
+        noti: await getNoti(3)
+    };
 }

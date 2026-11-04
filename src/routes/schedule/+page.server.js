@@ -1,5 +1,5 @@
 import env from 'dotenv'
-import ttable from 'comcigan-parser'
+import ttable from '../../lib/comcigan.js'
 const tt = new ttable();
 env.config();
 
@@ -16,9 +16,9 @@ async function getSd() {
 	return result[process.env.SCHOOL_GRADE][process.env.SCHOOL_CLASS];
 }
 
-export function load({ params }) {
+export async function load({ params }) {
 	process.stdout.write('\u0007');
-	let res = getSd();
+	const res = await getSd();
 	return {
 		res: res
 	};

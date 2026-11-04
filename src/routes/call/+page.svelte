@@ -129,7 +129,7 @@
 				<i
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
-					onclick="history.back()"
+					onclick={() => history.back()}
 				/>
 			</nav>
 		</div>
@@ -142,7 +142,7 @@
 				<h3 class="tWhite">선생님께 익명으로 알리기</h3>
 			</div>
 		</div>
-		<form action="/call" method="POST" on:submit|preventDefault={submit}>
+		<form action="/call" method="POST" onsubmit={(event) => { event.preventDefault(); submit(event); }}>
 			<div class="form-group">
 				<div class="formTitle">
 					<label for="Title" class="tWhite formDes">
@@ -191,7 +191,7 @@
 						pattern="([0-9]{'{'}6{'}'})"
 						autocomplete="one-time-code"
 					/>
-					<button type="button" class="btn btn-primary" on:click|preventDefault={phoneVerify}
+					<button type="button" class="btn btn-primary" onclick={(event) => { event.preventDefault(); phoneVerify(event); }}
 						>전화번호 인증</button
 					>
 				</div>
@@ -206,7 +206,7 @@
 							src="/editor/toastui/index.html"
 							class="editorIF"
 							title="ToastUI Editor"
-							on:load={loadEditor}
+							onload={loadEditor}
 							bind:this={editor}
 						/>
 					</p>

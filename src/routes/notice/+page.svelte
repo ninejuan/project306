@@ -21,7 +21,7 @@
 				<i
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
-					onclick="history.back()"
+					onclick={() => history.back()}
 				/>
 			</nav>
 		</div>
@@ -42,7 +42,7 @@
 					<button
 						type="button"
 						class="btn-primary btn notiWriteBtn"
-						onclick="location.href = '/notice/write'"
+						onclick={() => (location.href = '/notice/write')}
 					>
 						작성
 					</button>

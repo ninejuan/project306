@@ -5,7 +5,7 @@ import keySchema from '../../../models/secret.js'
 import { redirect } from '@sveltejs/kit';
 
 env.config();
-mongo.connect(`${process.env.MONGOSRV}`);
+if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV);
 
 function randomInt(min, max) {
     var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
