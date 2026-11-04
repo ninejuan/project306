@@ -19,13 +19,9 @@
 		window.fbAuth = getAuth();
 		window.fbAuth.languageCode = 'ko';
 
-		window.recaptchaVerifier = new RecaptchaVerifier(
-			'recaptcha-container',
-			{
-				size: 'invisible'
-			},
-			window.fbAuth
-		);
+		window.recaptchaVerifier = new RecaptchaVerifier(window.fbAuth, 'recaptcha-container', {
+			size: 'invisible'
+		});
 	});
 
 	function phoneVerify(event) {
@@ -108,7 +104,7 @@
 	}
 </script>
 
-<body class="ct">
+<div class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
 			<h1 class="logo">
@@ -130,7 +126,7 @@
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
 					onclick={() => history.back()}
-				/>
+				></i>
 			</nav>
 		</div>
 	</header>
@@ -203,12 +199,12 @@
 					<input type="hidden" id="content" name="content" required /><br />
 					<p class="tMiddle parentnIF">
 						<iframe
-							src="/editor/toastui/index.html"
+							src="/editor/toastui/"
 							class="editorIF"
 							title="ToastUI Editor"
 							onload={loadEditor}
 							bind:this={editor}
-						/>
+						></iframe>
 					</p>
 				</div>
 				<div class="warningContent">
@@ -220,7 +216,7 @@
 						<br>계속 이 페이지에 머문다면 관리자에게 문의해주세요.
 					</p>
 				</div>
-				<div id="recaptcha-container" />
+				<div id="recaptcha-container"></div>
 				<br /><br /><br /><br />
 				<button type="submit" class="submitBtn btn btn-primary btn-lg">전송</button>
 			</div>
@@ -300,5 +296,4 @@
 			</div>
 		</div>
 	</footer>
-</body>
-<slot />
+</div>

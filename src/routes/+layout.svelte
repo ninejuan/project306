@@ -33,8 +33,11 @@
 	/>
 	<title>306</title>
 	<script src="//code.jquery.com/jquery-latest.min.js"></script>
-	<script src="/js/navbar.js"></script>
-	<script src="/js/functions.js"></script>
+	<script defer src="/vendor/glightbox/js/glightbox.min.js"></script>
+	<script defer src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+	<script defer src="/vendor/swiper/swiper-bundle.min.js"></script>
+	<script defer src="/js/navbar.js"></script>
+	<script defer src="/js/functions.js"></script>
 	<link
 		href="
 //cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.min.css

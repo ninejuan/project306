@@ -18,7 +18,7 @@
 	}
 </script>
 
-<body class="ct">
+<div class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
 			<h1 class="logo">
@@ -38,7 +38,7 @@
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
 					onclick={() => history.back()}
-				/>
+				></i>
 			</nav>
 		</div>
 	</header>
@@ -96,12 +96,12 @@
 					<input type="hidden" id="content" name="content" required /><br />
 					<p class="tMiddle parentnIF">
 						<iframe
-							src="/editor/toastui/index.html"
+							src="/editor/toastui/"
 							class="editorIF"
 							title="ToastUI Editor"
 							onload={loadEditor}
 							bind:this={editor}
-						/>
+						></iframe>
 					</p>
 				</div>
 				<br /><br />
@@ -183,5 +183,4 @@
 			</div>
 		</div>
 	</footer>
-</body>
-<slot />
+</div>

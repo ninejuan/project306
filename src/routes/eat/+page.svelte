@@ -11,7 +11,7 @@
 </script>
 
 <link rel="stylesheet" href="/css/content.css" />
-<body class="ct">
+<div class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
 			<h1 class="logo"><a href="/" class="title" style="text-decoration: none;">306 ㅣ 급식</a></h1>
@@ -34,7 +34,7 @@
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
 					onclick={() => history.back()}
-				/>
+				></i>
 			</nav>
 		</div>
 	</header>
@@ -128,6 +128,5 @@
 			</div>
 		</div>
 	</footer>
-</body>
+</div>
 
-<slot />

@@ -2,7 +2,7 @@
 	export let data;
 </script>
 
-<body class="ct">
+<div class="ct">
 	<header id="header" class="fixed-top">
 		<div class="container d-flex align-items-center justify-content-between">
 			<h1 class="logo">
@@ -22,7 +22,7 @@
 					id="mobile-arrow-btn"
 					class="fas fa-arrow-left mobile-nav-toggle"
 					onclick={() => history.back()}
-				/>
+				></i>
 			</nav>
 		</div>
 	</header>
@@ -67,7 +67,6 @@
 											<a href="/notice/view?id={JSON.parse(JSON.stringify(d)).DocumentNum}">
 												{JSON.parse(JSON.stringify(d)).Title.substr(0, 17)}...
 											</a>
-											<p />
 										</th>
 										<td
 											>{JSON.parse(JSON.stringify(d)).when.year}.{JSON.parse(JSON.stringify(d)).when
@@ -76,7 +75,9 @@
 									</tr>
 								{/each}
 							{:else}
-								<p>알림장 데이터가 없습니다.</p>
+								<tr>
+									<td colspan="3">알림장 데이터가 없습니다.</td>
+								</tr>
 							{/if}
 						</tbody>
 					</table>
@@ -157,5 +158,4 @@
 			</div>
 		</div>
 	</footer>
-</body>
-<slot />
+</div>
