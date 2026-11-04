@@ -9,6 +9,25 @@
 - 알림장 (알림장 담당자가 작성해주세요.)
 - 익명 또는 실명 건의
 
+## 🚀 배포 (Cloudflare Workers)
+
+```bash
+yarn install --frozen-lockfile
+cp .env.example .dev.vars   # 로컬 개발용 값을 채운 뒤
+yarn build                  # WORKERS_CI=1 이면 Cloudflare adapter 사용
+yarn deploy                 # wrangler deploy
+```
+
+Cloudflare Workers Builds 설정:
+
+- Build command: `yarn build`
+- Deploy command: `yarn deploy` (또는 `npx wrangler deploy`)
+- Build output directory: `.svelte-kit/cloudflare`
+
+운영 환경변수는 Cloudflare 대시보드의 **Settings → Variables & Secrets**에
+`.env.example`과 동일한 이름으로 등록해야 합니다. 등록하지 않으면
+MongoDB/메일/급식 API를 사용하는 페이지가 500을 반환합니다.
+
 ## Copyright
 위 코드는 GNU GPL 3.0 라이센스가 적용됩니다.
 Copyright 2023 Juan Lee, All rights reserved.
