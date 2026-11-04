@@ -1,4 +1,4 @@
-import env from 'dotenv'
+import { env } from '$env/dynamic/private'
 import mongo from 'mongoose'
 import nodemailer from 'nodemailer'
 import fs from 'fs'
@@ -8,7 +8,6 @@ import { redirect } from '@sveltejs/kit';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { connectDb } from '../../lib/db.js';
-env.config();
 
 function randomInt(min, max) {
     var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -29,18 +28,18 @@ async function sendMail(data) {
         .replace('%minute%', `${now.getMinutes()}`)
         .replace('%content%', `${data.get('content').replaceAll('<img', '<img width="70%" height="40%"')}`)
     let transporter = nodemailer.createTransport({
-        host: process.env.MAIL_HOST,
-        port: process.env.MAIL_PORT,
+        host: env.MAIL_HOST,
+        port: env.MAIL_PORT,
         secure: true,
         auth: {
-            user: process.env.MAIL_USERNAME,
-            pass: process.env.MAIL_PASSWORD,
+            user: env.MAIL_USERNAME,
+            pass: env.MAIL_PASSWORD,
         },
     });
 
     let info = await transporter.sendMail({
-        from: process.env.MAIL_SENDER,
-        to: process.env.MAIL_RECEIVER,
+        from: env.MAIL_SENDER,
+        to: env.MAIL_RECEIVER,
         subject: `[306 익명전송] ${data.get('Title')}`,
         html: `${html}`
     }).then(async () => {
@@ -80,13 +79,13 @@ export async function load({ url }) {
 
     return {
         secrets: {
-            apiKey: process.env.FIREBASE_APIKEY,
-            authDomain: process.env.FIREBASE_AUTHDOMAIN,
-            projectId: process.env.FIREBASE_PROJECTID,
-            storageBucket: process.env.FIREBASE_STORAGEBUCKET,
-            messagingSenderId: process.env.FIREBASE_MESSAGESENDERID,
-            appId: process.env.FIREBASE_APPID,
-            measurementId: process.env.FIREBASE_MEASUREMENTID
+            apiKey: env.FIREBASE_APIKEY,
+            authDomain: env.FIREBASE_AUTHDOMAIN,
+            projectId: env.FIREBASE_PROJECTID,
+            storageBucket: env.FIREBASE_STORAGEBUCKET,
+            messagingSenderId: env.FIREBASE_MESSAGESENDERID,
+            appId: env.FIREBASE_APPID,
+            measurementId: env.FIREBASE_MEASUREMENTID
         }
     };
 }
@@ -103,7 +102,7 @@ export const actions = {
             console.log('no data')
             throw redirect(302, '/call');
         }
-        if (data.get('secretkey') !== process.env.CALL_KEY) {
+        if (data.get('secretkey') !== env.CALL_KEY) {
             console.log('sckey not match'); throw redirect(302, '/call');
         }
 

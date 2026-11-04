@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import mongoose from 'mongoose';
 import { connectDb } from '../../lib/db.js';
@@ -27,12 +28,10 @@ const TRACKED = [
 	'FIREBASE_MEASUREMENTID'
 ];
 
-export async function GET({ platform }) {
+export async function GET() {
 	const result = {
-		env: Object.fromEntries(TRACKED.map((key) => [key, Boolean(process.env[key])])),
-		platformEnv: platform?.env
-			? Object.keys(platform.env).filter((key) => typeof platform.env[key] === 'string')
-			: null,
+		env: Object.fromEntries(TRACKED.map((key) => [key, Boolean(env[key])])),
+		processEnv: Object.fromEntries(TRACKED.map((key) => [key, Boolean(process.env[key])])),
 		readyState: mongoose.connection.readyState
 	};
 

@@ -1,9 +1,10 @@
+import { env } from '$env/dynamic/private';
 import mongoose from 'mongoose';
 
 let connecting = null;
 
 export async function connectDb() {
-	const uri = process.env.MONGOSRV;
+	const uri = env.MONGOSRV;
 
 	if (!uri) {
 		throw new Error('MONGOSRV is not configured');

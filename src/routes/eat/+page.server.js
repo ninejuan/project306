@@ -1,6 +1,5 @@
 import axios from 'axios'
-import env from 'dotenv'
-env.config();
+import { env } from '$env/dynamic/private'
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -58,10 +57,10 @@ export async function load({ params }) {
         method: 'GET',
         uri: 'https://open.neis.go.kr/hub/mealServiceDietInfo',
         params: {
-            KEY: process.env.NEISAPIKEY,
+            KEY: env.NEISAPIKEY,
             Type: 'json',
-            ATPT_OFCDC_SC_CODE: process.env.SCHOOL_REGION,
-            SD_SCHUL_CODE: process.env.SCHOOL_CODE,
+            ATPT_OFCDC_SC_CODE: env.SCHOOL_REGION,
+            SD_SCHUL_CODE: env.SCHOOL_CODE,
             pSize: 5,
             MLSV_FROM_YMD: parseInt(getWeekDate()),
         },

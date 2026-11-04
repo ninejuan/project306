@@ -1,8 +1,6 @@
-import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../models/noti.js'
 import { connectDb } from '../../lib/db.js'
-env.config();
 
 // Noti view page
 

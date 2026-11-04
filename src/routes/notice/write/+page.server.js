@@ -1,11 +1,9 @@
-import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../../models/noti.js'
 import keySchema from '../../../models/secret.js'
 import { redirect } from '@sveltejs/kit';
 import { connectDb } from '../../../lib/db.js';
 
-env.config();
 
 
 function randomInt(min, max) {

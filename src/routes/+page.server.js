@@ -1,10 +1,9 @@
-import notiSchema from '../models/noti'
-import axios from 'axios'
-import env from 'dotenv'
+import notiSchema from '../models/noti'
+import axios from 'axios'
+import { env } from '$env/dynamic/private'
 import mongo from 'mongoose'
-import { connectDb } from '../lib/db.js'
-env.config();
-
+import { connectDb } from '../lib/db.js'
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const strs = {
@@ -105,10 +104,10 @@ async function getTodayMeal() {
         method: 'GET',
         uri: 'https://open.neis.go.kr/hub/mealServiceDietInfo',
         params: {
-            KEY: process.env.NEISAPIKEY,
+            KEY: env.NEISAPIKEY,
             Type: 'json',
-            ATPT_OFCDC_SC_CODE: process.env.SCHOOL_REGION,
-            SD_SCHUL_CODE: process.env.SCHOOL_CODE,
+            ATPT_OFCDC_SC_CODE: env.SCHOOL_REGION,
+            SD_SCHUL_CODE: env.SCHOOL_CODE,
             pSize: 1,
             MLSV_FROM_YMD: parseInt(getWeekDate()),
         },
