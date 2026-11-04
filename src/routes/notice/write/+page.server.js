@@ -2,10 +2,11 @@ import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../../models/noti.js'
 import keySchema from '../../../models/secret.js'
-import { redirect } from '@sveltejs/kit';
-
-env.config();
-if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV);
+import { redirect } from '@sveltejs/kit';
+import { connectDb } from '../../../lib/db.js';
+
+env.config();
+
 
 function randomInt(min, max) {
     var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -14,9 +15,11 @@ function randomInt(min, max) {
 
 export const actions = {
     // @ts-ignore
-    default: async ({ cookies, request }) => {
-        delete mongo.connection.models['notices'];
-        delete mongo.connection.models['secret'];
+    default: async ({ cookies, request }) => {
+        delete mongo.connection.models['notices'];
+        delete mongo.connection.models['secret'];
+        await connectDb();
+
 
         const data = await request.formData();
 

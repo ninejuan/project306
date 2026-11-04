@@ -1,13 +1,15 @@
 import env from 'dotenv'
 import mongo from 'mongoose'
-import notiSchema from '../../models/noti.js'
-env.config();
-if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV)
-
-// Noti view page
-
-export async function load({ params }) {
-    delete mongo.connection.models['notices']; delete mongo.connection.models['notices'];
+import notiSchema from '../../models/noti.js'
+import { connectDb } from '../../lib/db.js'
+env.config();
+
+// Noti view page
+
+export async function load({ params }) {
+    delete mongo.connection.models['notices']; delete mongo.connection.models['notices'];
+    await connectDb();
+
     const data = await notiSchema.find().lean().exec();
     return {
         data: data.map(notice => {

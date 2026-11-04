@@ -1,14 +1,13 @@
 import notiSchema from '../models/noti'
 import axios from 'axios'
 import env from 'dotenv'
-import mongo from 'mongoose'
+import mongo from 'mongoose'
+import { connectDb } from '../lib/db.js'
 env.config();
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
-if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV)
-
-const strs = {
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+const strs = {
     date: {
         weekend: [
             '주말은 참 빠르게 흘러가요.',
@@ -148,6 +147,7 @@ async function getNoti(num) {
 
 export async function load({ params }) {
     delete mongo.connection.models['notices'];
+    await connectDb();
 
     return {
         str: getRandomString(),

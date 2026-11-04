@@ -2,14 +2,16 @@ import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../../models/noti.js'
 import keySchema from '../../../models/secret.js'
-import { redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
+import { connectDb } from '../../../lib/db.js';
+
+env.config();
 
-env.config();
-if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV);
-
-export async function load({ url }) {
-    delete mongo.connection.models['notices'];
-    delete mongo.connection.models['secret'];
+export async function load({ url }) {
+    delete mongo.connection.models['notices'];
+    delete mongo.connection.models['secret'];
+    await connectDb();
+
 
     let data = await notiSchema.findOne({ DocumentNum: url.searchParams.get('id') }).lean().exec();
     if (!data) {
@@ -26,9 +28,11 @@ export async function load({ url }) {
 
 export const actions = {
     // @ts-ignore
-    default: async ({ cookies, request }) => {
-        delete mongo.connection.models['notices'];
-        delete mongo.connection.models['secret'];
+    default: async ({ cookies, request }) => {
+        delete mongo.connection.models['notices'];
+        delete mongo.connection.models['secret'];
+        await connectDb();
+
 
         const data = await request.formData();
         const now = new Date();

@@ -28,6 +28,8 @@ Cloudflare Workers Builds 설정:
 `.env.example`과 동일한 이름으로 등록해야 합니다. 등록하지 않으면
 MongoDB/메일/급식 API를 사용하는 페이지가 500을 반환합니다.
 
+배포 후 `GET /health`에서 환경변수 등록 여부와 MongoDB 연결 상태를 확인할 수 있습니다.
+
 ## Copyright
 위 코드는 GNU GPL 3.0 라이센스가 적용됩니다.
 Copyright 2023 Juan Lee, All rights reserved.

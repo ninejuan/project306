@@ -6,9 +6,9 @@ import helpSchema from '../../models/help.js'
 import htmlTemplate from '../../form.js'
 import { redirect } from '@sveltejs/kit';
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-env.config();
-if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV)
+import { getAnalytics } from "firebase/analytics";
+import { connectDb } from '../../lib/db.js';
+env.config();
 
 function randomInt(min, max) {
     var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -93,8 +93,10 @@ export async function load({ url }) {
 
 export const actions = {
     // @ts-ignore
-    default: async ({ cookies, request }) => {
-        delete mongo.connection.models['help'];
+    default: async ({ cookies, request }) => {
+        delete mongo.connection.models['help'];
+        await connectDb();
+
 
         const data = await request.formData();
         if (!data || !data.get('secretkey') || !data.get('Title') || !data.get('content') || !data.get('privacy')) {

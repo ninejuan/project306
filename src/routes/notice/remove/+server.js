@@ -3,14 +3,16 @@ import env from 'dotenv'
 import mongo from 'mongoose'
 import notiSchema from '../../../models/noti.js'
 import keySchema from '../../../models/secret.js'
-import { redirect } from '@sveltejs/kit';
-
-env.config();
-if (process.env.MONGOSRV) mongo.connect(process.env.MONGOSRV);
-
-export const GET = async ({ request, url }) => {
-    delete mongo.connection.models['notices'];
-    delete mongo.connection.models['secret'];
+import { redirect } from '@sveltejs/kit';
+import { connectDb } from '../../../lib/db.js';
+
+env.config();
+
+export const GET = async ({ request, url }) => {
+    delete mongo.connection.models['notices'];
+    delete mongo.connection.models['secret'];
+    await connectDb();
+
 
     let id = url.searchParams.get('id')
     let key = url.searchParams.get('key');
